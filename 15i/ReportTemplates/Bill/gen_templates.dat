@@ -1,0 +1,6 @@
+Bill.xls
+Bill.xls,請求書,true,
+Bill_jp_en.xls,請求書（日英切替）,true,
+Bill_subsum.xls,請求書（納品書小計あり・入金明細あり）,true,
+Bill_subsum2.xls,請求書（納品書小計あり・入金明細なし）,true,
+Bill_subsum3.xls,請求書（納品書小計なし・入金明細あり）,true,

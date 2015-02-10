@@ -1,0 +1,205 @@
+15i セキュアコーディングガイド
+
+※下記は15iの標準フレームワークに沿ったコーディングを行うことを前提としている。
+　フレームワークを改造する場合や、フレームワーク外での動作を行う場合は、脆弱性を発生させないよう
+　十分に注意を払うこと。
+
+※下記の文中における「ユーザーパラメータ」とは、ユーザー入力値やDB取得値のこと。
+
+
+■XSS対策
+
+　●基本ルール
+　
+　　・ユーザーパラメータを画面に表示する際は、必ずサニタイジング（エスケープ）する。
+        具体的には次項目以降を参照。
+
+　●$form変数に値をセットする場合
+　
+　　名前に _noEscape がついている$form変数：
+　　　　出力時エスケープされない。
+　　　　そのためHTMLタグを使用することができる。
+　　　　一方、ユーザーパラメータを含める場合は必ず個別にエスケープする必要がある。
+　　　　エスケープは h() 関数を用いる。
+　　　　
+　　　　　　○　$form['gen_message_noEscape'] = "<b>" . h($form['xxx']) . "</b>";    // OK
+　　　　　　
+　　　　　　×　$form['gen_message_noEscape'] = $form['xxx'];　　　　// NG。エスケープ漏れ。危険！
+　　
+　　上記以外の$form変数：
+　　　　次の値が出力時に自動エスケープされる。「&」「<」「>」「'」「"」
+　　　　そのためHTMLタグは使えない。
+　　　　またURLをセットする際も、上記の値を含めることはできない（URLEncodeすれば大丈夫）
+　　　　一方、ユーザーパラメータをそのまま含めても大丈夫。エスケープ不要。
+　　　　　　
+　　　　　　○　$form['gen_pageTitle'] = $form['xxx'];　　　　// OK。エスケープは不要
+　　　　　　
+　　　　　　×　$form['gen_pageTitle'] = h($form['xxx']);　　// NG。2重エスケープになる
+　　　　　　×　$form['gen_pageTitle'] = "<b>title</b>";　　 // NG。HTMLタグは動作しない
+　　
+　●smarty tpl を変更する場合
+　
+　　※標準の tpl を変更したり、独自の tpl を作成することはなるべく避けること。
+　　　（脆弱性の発生源になりやすいので。）
+　　　やむをえず行う場合、下記の事項に留意すること。
+　　
+　　・smarty tpl への値の引き渡しはすべて $form を経由して行う。
+　　　　独自の変数を smarty tpl に assign しない。
+
+　　・tpl内で変数の内容を表示する場合、忘れずに |escape する。（{$form.xxx|escape}）
+　　　escape できない場合、つまり HTMLタグが含まれる可能性のある変数を表示する場合は、
+　　　変数名に「_noEscape」を付ける。
+　　　　　　○　{$form.param|escape}　　　　// OK。エスケープしている
+　　　　　　○　{$form.param_noEscape}　　　// OK。エスケープしない場合は「_noEscape」をつける
+　　　　　　
+　　　　　　×　{$form.param}　　　　　　　　// NG。エスケープ漏れ。危険！
+　　　　　　
+　　　※「_noEscape」変数のPHPクラスでの扱い方については、前の項目を参照。
+　　　※「_noEscape」変数の使用は必要最低限にすること。
+　　　　　多くの場合、HTMLをtpl側に書くなどの方法で「_noEscape」の使用を避けられる。
+
+　●smarty plugin を変更する場合
+　
+　　・変数の値をHTMLに埋め込む際、必ずエスケープ（ h()） する。
+　　　　基本方針として、HTMLを組み立てる時点でエスケープを行う。（それより前にエスケープすると
+　　　　二重エスケープの危険性がある。）
+　　
+　　・エスケープ済みの値をいったん変数に入れる場合は、非エスケープの値と区別するため、変数名に
+　　　「_escape」をつける。
+
+　●Ajaxのサーバー側 (PHP)
+　　
+　　・Ajaxのサーバー側クラスはすべて、AjaxBase を継承する。
+　　　　_execute() 関数の中で処理を行う。
+　　　　連想配列を return することで値をクライアントに送信する。
+　　　　
+　　・上記を使用しない場合、次の点に注意する。
+　　　　・データ形式はすべてJSONとし、json_encode() で生成する。
+　　　　・エスケープ（サニタイジング）処理は行わない。データ送信はsimple.tplを使用する。
+
+　●Ajaxのクライアント側 (JavaScript)
+　
+  　・Ajaxによる取得値を画面に表示する際は次のようにする。
+　　　　
+　　　　取得値を単独で表示する場合：
+　　　　　　jQuery の .text() を使用する。（HTMLエスケープされる）
+　　　　　　【重要】.innerHTML や jQuery の .html() を使用しないこと。
+　　　　　　
+　　　　取得値をHTMLタグと組み合わせて表示する場合：
+　　　　　　jQuery の .html() を使用することになるが、タグの中に取得値を埋め込む際、必ず
+　　　　　　gen.util.escape() する。（タグの属性部分に埋め込む際もそうする。）
+　　　　
+　　　　取得値をタグ属性値とする場合（.value .text .label、jQuery の .val()で設定）：
+　　　　　　エスケープせず、そのまま使用する。
+　　　　　　※上記はJSで属性値設定する場合の話。前述のように、文字列としてHTMLを組み立てる場合は
+　　　　　　　属性値部分もエスケープが必要。
+
+　　　　取得値をalert()の表示メッセージに埋め込む場合：
+　　　　　　エスケープせず、そのまま使用する。
+
+　　　　※HTMLタグを含む値をAjaxで取得するような処理は極力避ける。
+　　　　　やむを得ない場合、HTMLタグ部分とパラメータ（ユーザー入力値・DB取得値）を別の値として
+　　　　　取得し、パラメータに関しては必ず gen.util.escape() する。
+
+　●location や aタグで扱うURLを動的に組み立てる場合（サーバー、JavaScript）
+    
+    ・スキームが http: もしくは https: であることを確認する。
+    　javascript: vbscript: data: などの埋め込みを避けるため。
+        JS
+		×　location.href = url;
+		×　document.getElementById("link").setAttribute("href",url);
+		○　if(url.match( /^https?:\/\// ) ){
+			document.getElementById("link").setAttribute("href",url);
+		　　}
+
+　※参考： 13i以前のAjaxの問題点（15iで改善された点）
+　
+　　　●データ形式がJSONの箇所と独自形式（セミコロン区切りなど）の箇所があり、統一されていない。
+　　
+　　　　独自形式の箇所では、デリミタとして使用している文字をエスケープ処理している。しかしエスケープと
+　　　　復元のタイミングや方式が統一されていない。
+
+　　　●XSS対策としてのサニタイジング（HTMLエスケープ）処理が、サーバー側で行われている箇所とクライア
+　　　　ント側で行われている箇所があり、統一されていない。
+　　
+　　　　基本的にはサーバー側でまとめて行われているが（ajax.tpl でHTMLエスケープ）、それに加えて個別に
+　　　　処理している箇所もある。
+　　　　また、意図的にサーバー側でHTMLエスケープしていない箇所もある（simple.tpl を使用。拡張DDなど）。
+
+　　　⇒上記のように処理方法が統一されていないため、二重エスケープ・復元漏れによる文字化けや、エスケ
+　　　　ープ漏れによるセキュリティホールが発生しやすくなっている。
+　　　　具体例： ag.cgi?page=ProjectDocView&ppid=1516&pbid=183194
+　　　　※たまたま表面化していないだけで、上記スレッドで指摘されている点以外にも、文字化けの可能性が
+　　　　　ある箇所が多数ある。
+
+
+
+■CSRF対策
+
+　　Genフレームワーク標準の仕組み（ListBase / EditBase / EntryBase / ModelBase / BulkDeleteBase。
+　　Ajaxは サーバー側: AjaxBase / クライアント側: gen.ajax.connect() ）を使用する場合、フレーム
+　　ワーク側で自動的に対策が行われる。
+    できる限り上記の仕組みを使用すること。
+　　
+　　しかしフレームワークを改造する場合やフレームワーク外で動作するようなコードを書く場合、
+　　CSRF対策が漏れることのないよう、十分に注意を払うこと。
+　　具体的には、何らかのデータ登録や変更を行う場合には、必ず前画面でトークン（ワンタイムトークン
+　　が望ましい）を発行し、登録時にそれを確認するようにする。
+　　Ajaxについては、Base_AjaxBase のコメントも参照。
+
+
+
+■SQL Injection対策
+
+　　基本的にはフレームワーク側で対処を行っている。（index.php ですべての入力値（$form）をDBサニ
+　　タイジング。）
+　　しかしそれだけでは危険な場合がある。次の点に留意する。
+　　
+　　・$form経由以外の方法で受け取ったユーザーパラメータ（つまり $_POST, $_GET, $_REQUEST, $_COOKIE 
+　　　等）をSQLに使用しない。
+　　
+　　・SQLに変数の値を埋め込む場合、それが数値であることを事前にチェックしているのでない限り、
+　　　数値カラムであっても必ず変数値をシングルクオートで囲む。
+　　　　
+　　　　○ $query = "select * from item_master where item_id = '{$itemId}'";
+　　　　× $query = "select * from item_master where item_id = {$itemId}";
+　　　　
+　　　　※後者の例では、仮に $itemId に "0;delete from item_master" が入っていたら大変。
+
+
+
+■ディレクトリトラバーサル・ファイルインクルード対策
+    ag.cgi?page=ProjectDocView&pPID=1574&pbid=196015
+
+　●動的ファイルへのアクセス
+
+    Gen_Storageクラスを使用してアクセスする。
+    （15iでは、動的ファイルはすべて同クラス経由でアクセスするのがルール。）
+    同クラスはセキュリティ対策実施済み。
+
+  ●静的ファイルへのアクセス
+
+    パスをコード内で静的に指定している場合は問題ない。
+    動的に（ユーザーが入力したパラメータを使用して）ファイルのパスを決める場合、
+    必ず Gen_File::safetyPath() 関数を使用する。
+
+　●動的にactionを指定する
+
+    必ず Gen_File::safetyPathForAction() 関数を使用する。
+    例： ○ require_once(Gen_File::safetyPathForAction($form['reportAction']));
+        ☓ require_once(APP_DIR . str_replace("_", "/", $form['reportAction']) . ".class.php");  // 危険
+
+
+
+■参考： 上記以外の、FW内で行っている主なセキュリティ向上策
+
+  ・POST/GET取得値はすべてDBサニタイジングする（index.php）
+　・ログイン後に session_regenerate_id() で PHPSESSIDを作り直す（Session Fixation対策）
+　・レスポンスヘッダーに「X-Content-Type-Options: nosniff」を付与する（XSS対策。index.php）
+　　　http://www.atmarkit.co.jp/ait/articles/1403/24/news005_2.html
+  ・AjaxクラスではX-Requested-Withヘッダをチェックし、XHRのリクエストのみに反応する（XSS/CSRF/JSONハイジャック対策。AjaxBase）
+　　　http://www.atmarkit.co.jp/ait/articles/1403/24/news005.html
+  ・AjaxクラスでのJSONデータ生成は json_encode() を用いる（evalインジェクション対策。AjaxBase）
+　　　http://d.hatena.ne.jp/ockeghem/20110906/p1
+  ・Ajaxクラスで Content-Typeを正しく（application/json; charset=UTF-8）設定する（XSS対策。AjaxBase）
+　　　http://d.hatena.ne.jp/ockeghem/20110907/p1

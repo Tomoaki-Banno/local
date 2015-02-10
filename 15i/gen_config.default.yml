@@ -1,0 +1,111 @@
+# ----- アプリケーション設定ファイル -----
+
+# サーバー内のすべてのアプリケーションに適用したい共通設定は、ここではなく gen_server_config.yml に書く。
+# ここに gen_server_config.yml と同じ項目を記述した場合、こちらの設定が優先される。
+# （つまり、このファイルで gen_server_config.yml の内容を上書きできる。）
+# ただし一部の子要素だけを上書きすることはできない。たとえば gen_server_config.yml に
+#   A:
+#     a:
+#     b:
+# という設定がある場合、このファイルに
+#   A:
+#     b:
+# とだけ書くことはできない。a: と b: の両方を書く必要がある。
+#
+# gen_config.ymlのデフォルト値を変更した場合は Config_AdminParam_Param も更新すること。
+
+database: 15i
+
+# ログイン有効期限（adminは除く）
+#login_limit: 2013/01/01
+
+#login_limitが設定されている場合、ログイン画面に何日前から警告を表示するか。0は無期限
+login_limit_days_notice: 0
+
+# 構築区分
+#                           製品版=10     体験版=20   サポート用=30   公開検証用=40   開発用=90    
+#                       ----------------------------------------------------------------------
+#   通知メール              ○有効         ○有効      ☓無効          ○有効        ☓無効
+#   PHPエラー               エラー画面     エラー画面   Genesiss STOP  エラー画面    Genesiss STOP
+#   BU読み込み(ファイル)     ○有効        ○有効       ○有効         ○有効        ☓無効
+server_info_class: 90
+
+# 製品グレード（Si / Mi。 左記以外はMi（フル機能）とみなす）
+#  メニューとアクセス権設定画面の項目に影響。各グレードごとの有効機能についてはLogic_Menu参照のこと。
+#  [重要] Mi以外のグレードに変更する場合、必ずユーザー登録画面で全ユーザーを再登録すること（ユーザーごとに編集画面を開き、登録ボタンを押すだけでOK）。
+#         当該グレードで対象外の機能に対するアクセス許可を消去するため。
+grade: Mi
+
+# ロット管理機能(15i)
+lot_management: true
+
+# データストレージサイズ（バックアップファイルのサイズの上限）（MB）
+# メンテナンスメニューの表示に影響する
+data_storage_size: 50
+
+# ファイルストレージサイズ（レコード/チャットの添付ファイルや、品目画像の合計サイズの上限）（MB）
+file_storage_size: 50
+
+# access_log を保存する期間（月）。この期間を超えたデータはログイン時に削除される。デフォルト24ヶ月
+# access_log_storage_life: 24   # gen_server_config.yml で設定するのが基本
+
+# 同一アカウントでの複数デバイス(PC)・ブラウザからの同時使用を許可するか（adminは除く）
+allow_concurrent_use: false
+
+# 画面の背景色 （サポート作業用。色を付けると見栄えがよくないので、顧客向け環境は白(=FFFFFF)を推奨）
+background_color: FFFFFF
+
+# 小数点以下桁数。-1は自然丸め（ただし帳票と拡張ドロップダウンは不可）
+decimal_point:
+  list: -1               # List画面(表)
+  edit: -1               # Edit画面(コントロール)
+  report: 2              # 帳票。自然丸め不可
+  excel: -1              # Excel。List画面とあわせておくとよい
+  dropdown: 2            # 拡張ドロップダウン。自然丸めは使えない
+
+report:
+  max_pages: 100                # 帳票の最大出力ページ数。この値を大きくするとサーバーにかなりの負荷がかかる場合があるので注意
+  max_seconds: 300              # 最大出力時間(秒)。サーバー負荷を考慮しつつ、上記のページ数の出力が可能な程度の時間を設定すること
+
+csv:
+  import:
+    max_lines: 1000             # 最大インポート行数（adminは無制限）
+    max_seconds: 300            # 最大インポート時間(秒)
+    from_encoding: SJIS         # 文字エンコーディング（SJIS / UTF-8）
+  export:
+    max_lines: 5000             # 最大エクスポート行数
+    to_encoding: SJIS           # 文字エンコーディング（SJIS / UTF-8）
+
+excel:
+    max_lines: 3000             # 最大出力行数（エクセルの書式数限界問題があるのであまり大きくしないこと）
+
+upload_file_size: 20971520      # アップロードを許可するファイルの最大サイズ（バイト）。20MB。詳細はindex.php参照
+
+template_file_size: 512000      # 帳票テンプレートファイル(.xls)の最大サイズ。500KB。あまり大きくするとPHPExcelでメモリ不足エラーになるので注意。詳細はindex.php参照
+
+backup_max_number: 5            # 保存するバックアップの最大数
+
+edit_detail_count:  20          # Edit画面のリストの最大行数
+alter_color: f2f3f4             # List画面で1行おきにつける色のカラーコード
+dropdown_per_page:  100         # 拡張ドロップダウンの1ページの行数
+default_location_name: (既定)   # デフォルトロケの名称
+
+item_order_count:   3           # ひとつの品目に対する手配先の最大値（標準手配先 + 代替手配先）
+item_process_count: 5           # ひとつの品目に対する工程数の最大値。これを増やすときは製造指示書テンプレートの工程欄の行数も増やすこと
+waster_count:       5           # 実績登録や実績CSVインポートでの不適合項目の数
+
+mrp_days: 100                   # 所要量計算期間
+
+chart_horiz_max:    50          # コンパスのグラフの、横軸の最大項目数
+
+desktop_notification_span: 10  # デスクトップ通知の更新間隔（分）。詳細はindex.php参照
+
+prefix:
+  estimate_number: M            # 見積番号
+  received_number: A            # 受注番号
+  delivery_number: S            # 納品書番号
+  bill_number: B                 # 請求書番号
+  partner_order_number: P      # 注文書番号
+  order_no_manufacturing: B    # 製造指示書 オーダー番号
+  order_no_partner: C           # 注文書 オーダー番号
+  order_no_subcontract: D      # 外製指示書 オーダー番号

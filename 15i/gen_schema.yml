@@ -1,0 +1,2084 @@
+# スキーマ変更SQL。
+# 　各ブロックの先頭に書かれている数字がスキーマバージョン。
+# 　スキーマバージョンは必ず数字にすること。数字が大きいほど新しいバージョンとみなされる。
+# 　ここに書かれているスキーマバージョンのうち最大のものが現行スキーマバージョンとみなされる。
+# 　ログイン時にデータのバージョンがチェックされ、現行スキーマバージョンより低ければ、書かれているSQLが実行される。
+# 　製品版のスキーマバージョンは rev + '00'。
+# 　カスタマイズの場合は下２桁をインクリメントしていく。
+
+# 15i
+
+2014010154:>
+  alter table item_in_out add column stock_amount numeric;
+
+2014010153:>
+  alter table estimate_header drop column if exists section_name;
+
+2014010152:>
+  update permission_master set permission = '1' where class_name = 'config_background' and permission = '2';
+
+2014010151:>
+  drop table if exists app_device_token;
+  create table app_device_token
+  (
+      device_token text primary key,
+      endpoint_arn text not null,
+      user_id int,
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+
+2014010150:>
+  alter table bill_detail add column item_id int;
+
+2014010149:>
+  alter table user_master add column section_id int;
+
+2014010148:>
+  alter table staff_schedule add column non_disclosure bool not null default false;
+
+2014010147: >
+  alter table user_master add column background_mode int default 0;
+  alter table user_master add column background_image text;
+  insert into permission_master (user_id, class_name, permission)
+    select user_id, 'config_background' as class_name, 2 as permission
+    from user_master;
+
+2014010146: >
+  drop table if exists chat_star;
+  create table chat_star
+  (
+    chat_detail_id int not null,
+    user_id int not null,
+
+    record_creator text,
+    record_create_date timestamp,
+    record_create_func text,
+    record_updater text,
+    record_update_date timestamp,
+    record_update_func text,
+
+    PRIMARY KEY (chat_detail_id, user_id)
+  );
+  create index chat_star_index1 on chat_star (chat_detail_id);
+
+2014010145: >
+  alter table staff_schedule add column background_color text;
+
+2014010144: >
+  alter table user_master add column restricted_user bool;
+
+2014010143: >
+  alter table item_in_out add column custom_text_1 text;
+  alter table item_in_out add column custom_text_2 text;
+  alter table item_in_out add column custom_text_3 text;
+  alter table item_in_out add column custom_text_4 text;
+  alter table item_in_out add column custom_text_5 text;
+  alter table item_in_out add column custom_text_6 text;
+  alter table item_in_out add column custom_text_7 text;
+  alter table item_in_out add column custom_text_8 text;
+  alter table item_in_out add column custom_text_9 text;
+  alter table item_in_out add column custom_text_10 text;
+  alter table item_in_out add column custom_date_1 date;
+  alter table item_in_out add column custom_date_2 date;
+  alter table item_in_out add column custom_date_3 date;
+  alter table item_in_out add column custom_date_4 date;
+  alter table item_in_out add column custom_date_5 date;
+  alter table item_in_out add column custom_date_6 date;
+  alter table item_in_out add column custom_date_7 date;
+  alter table item_in_out add column custom_date_8 date;
+  alter table item_in_out add column custom_date_9 date;
+  alter table item_in_out add column custom_date_10 date;
+  alter table item_in_out add column custom_numeric_1 numeric;
+  alter table item_in_out add column custom_numeric_2 numeric;
+  alter table item_in_out add column custom_numeric_3 numeric;
+  alter table item_in_out add column custom_numeric_4 numeric;
+  alter table item_in_out add column custom_numeric_5 numeric;
+  alter table item_in_out add column custom_numeric_6 numeric;
+  alter table item_in_out add column custom_numeric_7 numeric;
+  alter table item_in_out add column custom_numeric_8 numeric;
+  alter table item_in_out add column custom_numeric_9 numeric;
+  alter table item_in_out add column custom_numeric_10 numeric;
+
+2014010142: >
+  alter table chat_header add column is_system bool;
+
+2014010141: >
+  alter table estimate_detail add column remarks_2 text;
+
+2014010140: >
+  drop table if exists chat_like;
+  create table chat_like
+  (
+    chat_detail_id int not null,
+    user_id int not null,
+
+    record_creator text,
+    record_create_date timestamp,
+    record_create_func text,
+    record_updater text,
+    record_update_date timestamp,
+    record_update_func text,
+
+    PRIMARY KEY (chat_detail_id, user_id)
+  );
+  create index chat_like_index1 on chat_like (chat_detail_id);
+
+2014010139: >
+  alter table staff_schedule add column schedule_memo text;
+
+2014010138: >
+  alter table chat_header add column action_group text;
+  alter table chat_header add column record_id int;
+  alter table chat_header add column temp_user_id int;
+
+2014010137: >
+  drop table if exists staff_schedule_user;
+  create table staff_schedule_user
+  (
+      schedule_id int not null,   /* スケジュールid */
+      user_id int not null,       /* ユーザーid */
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+  create unique index staff_schedule_user_index1 on staff_schedule_user (schedule_id, user_id);
+  insert into staff_schedule_user (schedule_id, user_id) select schedule_id, user_id from staff_schedule;
+  alter table staff_schedule drop column user_id;
+
+2014010136: >
+  drop table if exists chat_group;
+  create table chat_group
+  (
+      chat_group_id serial primary key,
+
+      group_name text not null,
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+  alter table chat_header add column chat_group_id int;
+
+2014010135: >
+  alter table company_master add company_setting_update_time timestamp;
+
+2014010134: >
+  alter table staff_schedule add column repeat_pattern int;
+  alter table staff_schedule add column repeat_weekday int;
+  alter table staff_schedule add column repeat_day int;
+  
+2014010133: >
+  delete from chat_user where user_id = -1;
+  insert into chat_user (chat_header_id, user_id) select chat_header_id, -1 as user_id from chat_header;
+   
+2014010132: >
+  alter table bill_detail add column delivery_detail_id int;
+  update bill_detail set delivery_detail_id = t1.delivery_detail_id
+    from (
+        select 
+            max(delivery_detail_id) as delivery_detail_id
+            ,delivery_no
+            ,line_no 
+        from 
+            delivery_detail 
+            inner join delivery_header on delivery_detail.delivery_header_id = delivery_header.delivery_header_id
+        group by
+            delivery_no, line_no
+        ) as t1
+    where
+        bill_detail.delivery_no = t1.delivery_no
+        and bill_detail.line_no = t1.line_no;
+  
+2014010131: >
+  drop table if exists csv_format;
+  create table csv_format
+  (
+    action text not null,       /* action名 */
+    format_name text not null,  /* フォーマット名 */
+    format_data text not null,  /* フォーマット(JSON) */
+    description text,           /* 説明 */
+
+    record_creator text,
+    record_create_date timestamp,
+    record_create_func text,
+    record_updater text,
+    record_update_date timestamp,
+    record_update_func text
+  );
+
+# 13i rev.20140224（スキーマver 2014022401） の一部に相当。
+2014010129: >
+  alter table accepted add column precision int not null default 0;
+
+2014010128: >
+  CREATE OR REPLACE FUNCTION gen_round_precision(numeric, text, int)
+    RETURNS numeric AS
+  $BODY$
+    select
+        case $2
+            /* floor関数ではなく trunc関数を使用していることに注意。両者は負数の扱いが異なる。詳細は Gen_Math::round() のコメント2番を参照 */
+            when 'floor' then trunc($1, $3)
+            /* 標準のceil関数との違いは、丸め桁数を指定できることと、負数の扱いが異なること。詳細は Gen_Math::round() のコメント2番を参照 */
+            when 'ceil'  then trunc((case when $1 >=0 then ceil($1 * cast(pow(10, $3) as numeric)) else floor($1 * cast(pow(10, $3) as numeric)) end) / cast(pow(10, $3) as numeric), $3)
+              /* (13i以前）*/
+              /* when 'ceil' then trunc(trunc($1 * cast(pow(10, $3) as numeric) + case when $1 >=0 then 1 else -1 end * 0.9) / cast(pow(10, $3) as numeric), $3) */
+            else round($1, $3)
+        end
+  $BODY$
+    LANGUAGE 'sql' VOLATILE;
+
+  ALTER FUNCTION gen_round_precision(numeric, text, int) OWNER TO postgres;
+
+# 13i rev.20140224（スキーマver 2014022401） に相当。
+# 13i の同スキーマバージョンからのアップグレードの場合、このSQLは実行されない（Gen_Db::_updateSchema()）
+2014010127: >
+  alter table accepted add column payment_report_timing int;
+  alter table accepted add column tax_rate numeric;
+  alter table accepted add column rounding text;
+  update
+      accepted
+  set
+      tax_rate = (case when tax_class = 1 then 0 else t_tax_rate.tax_rate end)
+  from
+      (select
+          accepted_id
+          ,max_apply_date
+          ,tax_rate
+      from
+          (select
+              accepted_id
+              ,max(apply_date) as max_apply_date
+          from
+              accepted
+              left join (select tax_rate, apply_date from tax_rate_master
+                  union select 5 as tax_rate, '1997-04-01' as apply_date from company_master
+                  ) as tax_rate_master on coalesce(accepted.inspection_date,accepted.accepted_date) >= tax_rate_master.apply_date
+          group by
+              accepted_id
+          ) as t_tax_apply_date
+          left join (select tax_rate, apply_date from tax_rate_master
+              union select 5 as tax_rate, '1997-04-01' as apply_date from company_master
+              ) as t_tax_master on t_tax_apply_date.max_apply_date = t_tax_master.apply_date
+      ) as t_tax_rate
+  where
+      accepted.accepted_id = t_tax_rate.accepted_id
+  ;
+  update
+      accepted
+  set
+      payment_report_timing = t_timing.payment_report_timing
+      ,rounding = t_timing.rounding
+  from
+      (select
+          accepted_id
+          ,min(company_master.payment_report_timing) as payment_report_timing
+          ,max(coalesce(customer_master.rounding,'round')) as rounding
+      from
+          accepted
+          inner join order_detail on accepted.order_detail_id = order_detail.order_detail_id
+          inner join order_header on order_detail.order_header_id = order_header.order_header_id
+          inner join customer_master on order_header.partner_id = customer_master.customer_id
+          left join company_master on 1=1
+      group by
+          accepted_id) as t_timing
+  where
+      accepted.accepted_id = t_timing.accepted_id
+  ;
+
+2014010126: >
+  CREATE OR REPLACE FUNCTION gen_round_precision(numeric, text, int)
+  RETURNS numeric AS
+  $BODY$
+    select
+        case $2
+            when 'floor' then trunc($1, $3)
+            when 'ceil'  then trunc(ceil($1 * cast(pow(10, $3) as numeric)) / cast(pow(10, $3) as numeric), $3)
+            else round($1, $3)
+        end
+  $BODY$
+  LANGUAGE 'sql' VOLATILE;
+
+  ALTER FUNCTION gen_round_precision(numeric, text, int) OWNER TO postgres;
+
+2014010125: >
+  alter table order_process add column process_completed bool;
+
+2014010124: >
+  alter table upload_file_info add column file_size numeric;
+
+2014010123: >
+  create index upload_file_info_index1 on upload_file_info (action_group, record_id);
+
+2014010122: >
+  alter table order_detail add column custom_text_1 text;
+  alter table order_detail add column custom_text_2 text;
+  alter table order_detail add column custom_text_3 text;
+  alter table order_detail add column custom_text_4 text;
+  alter table order_detail add column custom_text_5 text;
+  alter table order_detail add column custom_text_6 text;
+  alter table order_detail add column custom_text_7 text;
+  alter table order_detail add column custom_text_8 text;
+  alter table order_detail add column custom_text_9 text;
+  alter table order_detail add column custom_text_10 text;
+  alter table order_detail add column custom_date_1 date;
+  alter table order_detail add column custom_date_2 date;
+  alter table order_detail add column custom_date_3 date;
+  alter table order_detail add column custom_date_4 date;
+  alter table order_detail add column custom_date_5 date;
+  alter table order_detail add column custom_date_6 date;
+  alter table order_detail add column custom_date_7 date;
+  alter table order_detail add column custom_date_8 date;
+  alter table order_detail add column custom_date_9 date;
+  alter table order_detail add column custom_date_10 date;
+  alter table order_detail add column custom_numeric_1 numeric;
+  alter table order_detail add column custom_numeric_2 numeric;
+  alter table order_detail add column custom_numeric_3 numeric;
+  alter table order_detail add column custom_numeric_4 numeric;
+  alter table order_detail add column custom_numeric_5 numeric;
+  alter table order_detail add column custom_numeric_6 numeric;
+  alter table order_detail add column custom_numeric_7 numeric;
+  alter table order_detail add column custom_numeric_8 numeric;
+  alter table order_detail add column custom_numeric_9 numeric;
+  alter table order_detail add column custom_numeric_10 numeric;
+
+2014010121: >
+  alter table received_detail add column custom_text_1 text;
+  alter table received_detail add column custom_text_2 text;
+  alter table received_detail add column custom_text_3 text;
+  alter table received_detail add column custom_text_4 text;
+  alter table received_detail add column custom_text_5 text;
+  alter table received_detail add column custom_text_6 text;
+  alter table received_detail add column custom_text_7 text;
+  alter table received_detail add column custom_text_8 text;
+  alter table received_detail add column custom_text_9 text;
+  alter table received_detail add column custom_text_10 text;
+  alter table received_detail add column custom_date_1 date;
+  alter table received_detail add column custom_date_2 date;
+  alter table received_detail add column custom_date_3 date;
+  alter table received_detail add column custom_date_4 date;
+  alter table received_detail add column custom_date_5 date;
+  alter table received_detail add column custom_date_6 date;
+  alter table received_detail add column custom_date_7 date;
+  alter table received_detail add column custom_date_8 date;
+  alter table received_detail add column custom_date_9 date;
+  alter table received_detail add column custom_date_10 date;
+  alter table received_detail add column custom_numeric_1 numeric;
+  alter table received_detail add column custom_numeric_2 numeric;
+  alter table received_detail add column custom_numeric_3 numeric;
+  alter table received_detail add column custom_numeric_4 numeric;
+  alter table received_detail add column custom_numeric_5 numeric;
+  alter table received_detail add column custom_numeric_6 numeric;
+  alter table received_detail add column custom_numeric_7 numeric;
+  alter table received_detail add column custom_numeric_8 numeric;
+  alter table received_detail add column custom_numeric_9 numeric;
+  alter table received_detail add column custom_numeric_10 numeric;
+
+  alter table estimate_detail add column custom_text_1 text;
+  alter table estimate_detail add column custom_text_2 text;
+  alter table estimate_detail add column custom_text_3 text;
+  alter table estimate_detail add column custom_text_4 text;
+  alter table estimate_detail add column custom_text_5 text;
+  alter table estimate_detail add column custom_text_6 text;
+  alter table estimate_detail add column custom_text_7 text;
+  alter table estimate_detail add column custom_text_8 text;
+  alter table estimate_detail add column custom_text_9 text;
+  alter table estimate_detail add column custom_text_10 text;
+  alter table estimate_detail add column custom_date_1 date;
+  alter table estimate_detail add column custom_date_2 date;
+  alter table estimate_detail add column custom_date_3 date;
+  alter table estimate_detail add column custom_date_4 date;
+  alter table estimate_detail add column custom_date_5 date;
+  alter table estimate_detail add column custom_date_6 date;
+  alter table estimate_detail add column custom_date_7 date;
+  alter table estimate_detail add column custom_date_8 date;
+  alter table estimate_detail add column custom_date_9 date;
+  alter table estimate_detail add column custom_date_10 date;
+  alter table estimate_detail add column custom_numeric_1 numeric;
+  alter table estimate_detail add column custom_numeric_2 numeric;
+  alter table estimate_detail add column custom_numeric_3 numeric;
+  alter table estimate_detail add column custom_numeric_4 numeric;
+  alter table estimate_detail add column custom_numeric_5 numeric;
+  alter table estimate_detail add column custom_numeric_6 numeric;
+  alter table estimate_detail add column custom_numeric_7 numeric;
+  alter table estimate_detail add column custom_numeric_8 numeric;
+  alter table estimate_detail add column custom_numeric_9 numeric;
+  alter table estimate_detail add column custom_numeric_10 numeric;
+  
+  alter table delivery_detail add column custom_text_1 text;
+  alter table delivery_detail add column custom_text_2 text;
+  alter table delivery_detail add column custom_text_3 text;
+  alter table delivery_detail add column custom_text_4 text;
+  alter table delivery_detail add column custom_text_5 text;
+  alter table delivery_detail add column custom_text_6 text;
+  alter table delivery_detail add column custom_text_7 text;
+  alter table delivery_detail add column custom_text_8 text;
+  alter table delivery_detail add column custom_text_9 text;
+  alter table delivery_detail add column custom_text_10 text;
+  alter table delivery_detail add column custom_date_1 date;
+  alter table delivery_detail add column custom_date_2 date;
+  alter table delivery_detail add column custom_date_3 date;
+  alter table delivery_detail add column custom_date_4 date;
+  alter table delivery_detail add column custom_date_5 date;
+  alter table delivery_detail add column custom_date_6 date;
+  alter table delivery_detail add column custom_date_7 date;
+  alter table delivery_detail add column custom_date_8 date;
+  alter table delivery_detail add column custom_date_9 date;
+  alter table delivery_detail add column custom_date_10 date;
+  alter table delivery_detail add column custom_numeric_1 numeric;
+  alter table delivery_detail add column custom_numeric_2 numeric;
+  alter table delivery_detail add column custom_numeric_3 numeric;
+  alter table delivery_detail add column custom_numeric_4 numeric;
+  alter table delivery_detail add column custom_numeric_5 numeric;
+  alter table delivery_detail add column custom_numeric_6 numeric;
+  alter table delivery_detail add column custom_numeric_7 numeric;
+  alter table delivery_detail add column custom_numeric_8 numeric;
+  alter table delivery_detail add column custom_numeric_9 numeric;
+  alter table delivery_detail add column custom_numeric_10 numeric;
+
+2014010120: >
+  alter table received_detail add column remarks_2 text;
+
+2014010119: >
+  drop table if exists stock_price_history; /* 15iのDBに13iのデータを読み込んだときのトラブル防止 */
+  create table stock_price_history (
+    assessment_date date not null,
+    item_id int not null,
+    stock_price numeric not null,
+    stock_quantity numeric not null
+  );
+  create unique index stock_price_history_index1 on stock_price_history (assessment_date, item_id);
+  
+  insert into stock_price_history (assessment_date, item_id, stock_price, stock_quantity) 
+  select (select last_assessment_date from company_master), item_id, item_price, stock_quantity from stock_price_assessment;
+  
+  drop table stock_price_assessment;
+
+2014010118: >
+  alter table bill_header drop column if exists detail_display; /* 13i rev.20131219以降は追加済み */
+  alter table bill_header add column detail_display int default 0;
+  
+2014010117: >
+  alter table achievement add column cost_1 numeric;
+  alter table achievement add column cost_2 numeric;
+  alter table achievement add column cost_3 numeric;
+  alter table achievement drop column cost;
+  alter table achievement drop column labor_cost;
+  alter table order_detail drop column cost;
+  alter table order_detail drop column foreign_currency_cost;
+  alter table received_detail drop column cost;
+  alter table received_detail drop column foreign_currency_cost;
+
+2014010116: >
+  update delivery_header set delivery_no = delivery_header_id;
+  alter table order_header alter column order_id_for_user type text;
+  alter table estimate_detail add column estimate_amount numeric;
+  alter table estimate_detail add column base_cost_total numeric;
+  alter table estimate_detail add column foreign_currency_estimate_amount numeric;
+  alter table estimate_detail add column foreign_currency_base_cost_total numeric;
+  update estimate_detail set estimate_amount = quantity * sale_price;
+  update estimate_detail set base_cost_total = quantity * base_cost;
+  update estimate_detail set foreign_currency_estimate_amount = quantity * foreign_currency_sale_price;
+  update estimate_detail set foreign_currency_base_cost_total = quantity * foreign_currency_base_cost;
+
+2014010115: >
+  alter table delivery_header add column delivery_no text unique;
+  
+2014010114: >
+  alter table chat_header add column is_ecom bool;
+  alter table chat_detail add column ecom_chat_key int;
+  alter table company_master add column ecom_chat_version int;
+
+2014010113: >
+  alter table achievement add column break_minute numeric;
+
+2014010112: >
+  update data_access_log set user_name = 'e-commode' where user_name = 'admin';
+
+2014010111: >
+  update accepted set record_creator = 'e-commode' where record_creator = 'admin';
+  update access_log set record_creator = 'e-commode' where record_creator = 'admin';
+  update achievement set record_creator = 'e-commode' where record_creator = 'admin';
+  update alert_mail_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update bill_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update bill_header set record_creator = 'e-commode' where record_creator = 'admin';
+  update bom_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update chat_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update chat_header set record_creator = 'e-commode' where record_creator = 'admin';
+  update chat_user set record_creator = 'e-commode' where record_creator = 'admin';
+  update column_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update company_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update control_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update currency_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update customer_group_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update customer_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update customer_price_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update data_access_log set record_creator = 'e-commode' where record_creator = 'admin';
+  update delivery_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update delivery_header set record_creator = 'e-commode' where record_creator = 'admin';
+  update dropdown_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update equip_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update estimate_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update estimate_header set record_creator = 'e-commode' where record_creator = 'admin';
+  update holiday_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update inventory set record_creator = 'e-commode' where record_creator = 'admin';
+  update item_group_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update item_in_out set record_creator = 'e-commode' where record_creator = 'admin';
+  update item_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update item_order_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update item_process_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update location_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update location_move set record_creator = 'e-commode' where record_creator = 'admin';
+  update lot_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update mail_address_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update mrp set record_creator = 'e-commode' where record_creator = 'admin';
+  update mrp_process set record_creator = 'e-commode' where record_creator = 'admin';
+  update order_child_item set record_creator = 'e-commode' where record_creator = 'admin';
+  update order_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update order_header set record_creator = 'e-commode' where record_creator = 'admin';
+  update order_process set record_creator = 'e-commode' where record_creator = 'admin';
+  update page_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update paying_in set record_creator = 'e-commode' where record_creator = 'admin';
+  update payment set record_creator = 'e-commode' where record_creator = 'admin';
+  update permission_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update plan set record_creator = 'e-commode' where record_creator = 'admin';
+  update price_percent_group_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update process_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update rate_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update received_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update received_dummy_child_item set record_creator = 'e-commode' where record_creator = 'admin';
+  update received_header set record_creator = 'e-commode' where record_creator = 'admin';
+  update search_column_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update section_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update seiban_change set record_creator = 'e-commode' where record_creator = 'admin';
+  update seiban_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update session_table set record_creator = 'e-commode' where record_creator = 'admin';
+  update staff_schedule set record_creator = 'e-commode' where record_creator = 'admin';
+  update stickynote_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update stock_price_assessment set record_creator = 'e-commode' where record_creator = 'admin';
+  update tax_rate_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update upload_file_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update use_plan set record_creator = 'e-commode' where record_creator = 'admin';
+  update user_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update user_template_info set record_creator = 'e-commode' where record_creator = 'admin';
+  update waster_detail set record_creator = 'e-commode' where record_creator = 'admin';
+  update waster_master set record_creator = 'e-commode' where record_creator = 'admin';
+  update worker_master set record_creator = 'e-commode' where record_creator = 'admin';
+  
+  update accepted set record_updater = 'e-commode' where record_updater = 'admin';
+  update access_log set record_updater = 'e-commode' where record_updater = 'admin';
+  update achievement set record_updater = 'e-commode' where record_updater = 'admin';
+  update alert_mail_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update bill_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update bill_header set record_updater = 'e-commode' where record_updater = 'admin';
+  update bom_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update chat_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update chat_header set record_updater = 'e-commode' where record_updater = 'admin';
+  update chat_user set record_updater = 'e-commode' where record_updater = 'admin';
+  update column_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update company_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update control_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update currency_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update customer_group_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update customer_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update customer_price_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update data_access_log set record_updater = 'e-commode' where record_updater = 'admin';
+  update delivery_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update delivery_header set record_updater = 'e-commode' where record_updater = 'admin';
+  update dropdown_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update equip_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update estimate_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update estimate_header set record_updater = 'e-commode' where record_updater = 'admin';
+  update holiday_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update inventory set record_updater = 'e-commode' where record_updater = 'admin';
+  update item_group_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update item_in_out set record_updater = 'e-commode' where record_updater = 'admin';
+  update item_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update item_order_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update item_process_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update location_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update location_move set record_updater = 'e-commode' where record_updater = 'admin';
+  update lot_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update mail_address_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update mrp set record_updater = 'e-commode' where record_updater = 'admin';
+  update mrp_process set record_updater = 'e-commode' where record_updater = 'admin';
+  update order_child_item set record_updater = 'e-commode' where record_updater = 'admin';
+  update order_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update order_header set record_updater = 'e-commode' where record_updater = 'admin';
+  update order_process set record_updater = 'e-commode' where record_updater = 'admin';
+  update page_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update paying_in set record_updater = 'e-commode' where record_updater = 'admin';
+  update payment set record_updater = 'e-commode' where record_updater = 'admin';
+  update permission_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update plan set record_updater = 'e-commode' where record_updater = 'admin';
+  update price_percent_group_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update process_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update rate_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update received_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update received_dummy_child_item set record_updater = 'e-commode' where record_updater = 'admin';
+  update received_header set record_updater = 'e-commode' where record_updater = 'admin';
+  update search_column_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update section_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update seiban_change set record_updater = 'e-commode' where record_updater = 'admin';
+  update seiban_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update session_table set record_updater = 'e-commode' where record_updater = 'admin';
+  update staff_schedule set record_updater = 'e-commode' where record_updater = 'admin';
+  update stickynote_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update stock_price_assessment set record_updater = 'e-commode' where record_updater = 'admin';
+  update tax_rate_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update upload_file_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update use_plan set record_updater = 'e-commode' where record_updater = 'admin';
+  update user_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update user_template_info set record_updater = 'e-commode' where record_updater = 'admin';
+  update waster_detail set record_updater = 'e-commode' where record_updater = 'admin';
+  update waster_master set record_updater = 'e-commode' where record_updater = 'admin';
+  update worker_master set record_updater = 'e-commode' where record_updater = 'admin';
+
+2014010110: >
+  alter table worker_master add column end_worker bool;
+
+2014010108: >
+  alter table location_move add column custom_text_1 text;
+  alter table location_move add column custom_text_2 text;
+  alter table location_move add column custom_text_3 text;
+  alter table location_move add column custom_text_4 text;
+  alter table location_move add column custom_text_5 text;
+  alter table location_move add column custom_text_6 text;
+  alter table location_move add column custom_text_7 text;
+  alter table location_move add column custom_text_8 text;
+  alter table location_move add column custom_text_9 text;
+  alter table location_move add column custom_text_10 text;
+  alter table location_move add column custom_date_1 date;
+  alter table location_move add column custom_date_2 date;
+  alter table location_move add column custom_date_3 date;
+  alter table location_move add column custom_date_4 date;
+  alter table location_move add column custom_date_5 date;
+  alter table location_move add column custom_date_6 date;
+  alter table location_move add column custom_date_7 date;
+  alter table location_move add column custom_date_8 date;
+  alter table location_move add column custom_date_9 date;
+  alter table location_move add column custom_date_10 date;
+  alter table location_move add column custom_numeric_1 numeric;
+  alter table location_move add column custom_numeric_2 numeric;
+  alter table location_move add column custom_numeric_3 numeric;
+  alter table location_move add column custom_numeric_4 numeric;
+  alter table location_move add column custom_numeric_5 numeric;
+  alter table location_move add column custom_numeric_6 numeric;
+  alter table location_move add column custom_numeric_7 numeric;
+  alter table location_move add column custom_numeric_8 numeric;
+  alter table location_move add column custom_numeric_9 numeric;
+  alter table location_move add column custom_numeric_10 numeric;
+
+2014010107: >
+  alter table chat_detail add column file_size numeric;
+  alter table chat_detail add column image_width int;
+  alter table chat_detail add column image_height int;
+
+2014010106: >
+  drop table if exists received_dummy_child_item;
+  create table received_dummy_child_item
+  (
+      received_detail_id_for_dummy int not null,
+      child_item_id int not null,               
+      quantity numeric not null,                
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text,
+
+      primary key (received_detail_id_for_dummy, child_item_id)
+  );
+  create index received_dummy_child_item_index1 on received_dummy_child_item(received_detail_id_for_dummy);
+  
+2014010104: >
+  alter table use_plan add column received_detail_id_for_dummy int;
+
+2014010103: >
+  update item_in_out set classification = 'out' where classification = 'return'; /* 返品登録画面があった時代のデータ */
+
+2014010102: >
+  alter table customer_master add column template_delivery text;
+  alter table customer_master add column template_bill text;
+  alter table customer_master add column template_partner_order text;
+  alter table customer_master add column template_subcontract text;
+
+2014010101: >
+  alter table estimate_detail add column foreign_currency_id int;
+  alter table estimate_detail add column foreign_currency_rate numeric;
+  alter table estimate_detail add column foreign_currency_sale_price numeric;
+  alter table estimate_detail add column foreign_currency_estimate_tax numeric;
+  alter table estimate_detail add column foreign_currency_base_cost numeric;
+    
+  alter table company_master add column starting_month_of_accounting_period int not null default 1;
+  update stickynote_info set x_pos = -300; /* 座標系が変わり横位置が乱れるため */
+  alter table error_log drop column if exists call_stack;
+  alter table error_log add column call_stack text;
+  delete from control_info; /* 編集画面の並び順はリセット。乱れることがあるため */
+
+  alter table received_detail add column cost numeric;
+  alter table received_detail add column foreign_currency_cost numeric;
+  alter table order_detail add column cost numeric;
+  alter table order_detail add column foreign_currency_cost numeric;
+  alter table achievement add column cost numeric;
+  alter table achievement add column labor_cost numeric;
+  
+  drop table if exists chat_header;
+  create table chat_header
+  (
+      chat_header_id serial primary key,
+
+      title text not null,
+      author_id int not null,
+      create_time timestamp not null,
+      is_pin bool,
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+  drop table if exists chat_detail;
+  create table chat_detail
+  (
+      chat_detail_id serial primary key,
+      chat_header_id int not null,
+
+      user_id int not null,
+      chat_time timestamp not null,
+      content text not null,
+      file_name text,
+      original_file_name text,
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+  create index chat_detail_index1 on chat_detail (user_id);
+  drop table if exists chat_user;
+  create table chat_user
+  (
+      chat_header_id int not null,
+      user_id int not null,
+      readed_chat_detail_id int,
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text,
+      
+      PRIMARY KEY (chat_header_id, user_id)
+  );
+  create index chat_user_index1 on chat_user (user_id);
+  
+  alter table user_master add column show_chat_dialog bool;
+  alter table user_master add column chat_dialog_x int;
+  alter table user_master add column chat_dialog_y int;
+  alter table user_master add column chat_dialog_width int;
+  alter table user_master add column chat_dialog_height int;
+  alter table user_master add column last_chat_header_id int;
+
+  alter table company_master add column show_chat_dialog bool;
+  alter table company_master add column chat_dialog_x int;
+  alter table company_master add column chat_dialog_y int;
+  alter table company_master add column chat_dialog_width int;
+  alter table company_master add column chat_dialog_height int;
+  alter table company_master add column last_chat_header_id int;
+  
+  alter table user_master add column show_first_intro bool;
+
+  alter table user_master add column login_user_id text unique;
+  update user_master set login_user_id = user_name;
+  
+  alter table column_info add column column_wrapon int;
+  
+  alter table item_master add column use_by_days int;
+  alter table item_master add column lot_header text;
+  alter table achievement add column use_by date;
+  alter table accepted add column use_by date;
+
+  alter table accepted add column custom_text_1 text;
+  alter table accepted add column custom_text_2 text;
+  alter table accepted add column custom_text_3 text;
+  alter table accepted add column custom_text_4 text;
+  alter table accepted add column custom_text_5 text;
+  alter table accepted add column custom_text_6 text;
+  alter table accepted add column custom_text_7 text;
+  alter table accepted add column custom_text_8 text;
+  alter table accepted add column custom_text_9 text;
+  alter table accepted add column custom_text_10 text;
+  alter table accepted add column custom_date_1 date;
+  alter table accepted add column custom_date_2 date;
+  alter table accepted add column custom_date_3 date;
+  alter table accepted add column custom_date_4 date;
+  alter table accepted add column custom_date_5 date;
+  alter table accepted add column custom_date_6 date;
+  alter table accepted add column custom_date_7 date;
+  alter table accepted add column custom_date_8 date;
+  alter table accepted add column custom_date_9 date;
+  alter table accepted add column custom_date_10 date;
+  alter table accepted add column custom_numeric_1 numeric;
+  alter table accepted add column custom_numeric_2 numeric;
+  alter table accepted add column custom_numeric_3 numeric;
+  alter table accepted add column custom_numeric_4 numeric;
+  alter table accepted add column custom_numeric_5 numeric;
+  alter table accepted add column custom_numeric_6 numeric;
+  alter table accepted add column custom_numeric_7 numeric;
+  alter table accepted add column custom_numeric_8 numeric;
+  alter table accepted add column custom_numeric_9 numeric;
+  alter table accepted add column custom_numeric_10 numeric;
+
+  alter table achievement add column custom_text_1 text;
+  alter table achievement add column custom_text_2 text;
+  alter table achievement add column custom_text_3 text;
+  alter table achievement add column custom_text_4 text;
+  alter table achievement add column custom_text_5 text;
+  alter table achievement add column custom_text_6 text;
+  alter table achievement add column custom_text_7 text;
+  alter table achievement add column custom_text_8 text;
+  alter table achievement add column custom_text_9 text;
+  alter table achievement add column custom_text_10 text;
+  alter table achievement add column custom_date_1 date;
+  alter table achievement add column custom_date_2 date;
+  alter table achievement add column custom_date_3 date;
+  alter table achievement add column custom_date_4 date;
+  alter table achievement add column custom_date_5 date;
+  alter table achievement add column custom_date_6 date;
+  alter table achievement add column custom_date_7 date;
+  alter table achievement add column custom_date_8 date;
+  alter table achievement add column custom_date_9 date;
+  alter table achievement add column custom_date_10 date;
+  alter table achievement add column custom_numeric_1 numeric;
+  alter table achievement add column custom_numeric_2 numeric;
+  alter table achievement add column custom_numeric_3 numeric;
+  alter table achievement add column custom_numeric_4 numeric;
+  alter table achievement add column custom_numeric_5 numeric;
+  alter table achievement add column custom_numeric_6 numeric;
+  alter table achievement add column custom_numeric_7 numeric;
+  alter table achievement add column custom_numeric_8 numeric;
+  alter table achievement add column custom_numeric_9 numeric;
+  alter table achievement add column custom_numeric_10 numeric;
+
+  alter table customer_master add column custom_text_1 text;
+  alter table customer_master add column custom_text_2 text;
+  alter table customer_master add column custom_text_3 text;
+  alter table customer_master add column custom_text_4 text;
+  alter table customer_master add column custom_text_5 text;
+  alter table customer_master add column custom_text_6 text;
+  alter table customer_master add column custom_text_7 text;
+  alter table customer_master add column custom_text_8 text;
+  alter table customer_master add column custom_text_9 text;
+  alter table customer_master add column custom_text_10 text;
+  alter table customer_master add column custom_date_1 date;
+  alter table customer_master add column custom_date_2 date;
+  alter table customer_master add column custom_date_3 date;
+  alter table customer_master add column custom_date_4 date;
+  alter table customer_master add column custom_date_5 date;
+  alter table customer_master add column custom_date_6 date;
+  alter table customer_master add column custom_date_7 date;
+  alter table customer_master add column custom_date_8 date;
+  alter table customer_master add column custom_date_9 date;
+  alter table customer_master add column custom_date_10 date;
+  alter table customer_master add column custom_numeric_1 numeric;
+  alter table customer_master add column custom_numeric_2 numeric;
+  alter table customer_master add column custom_numeric_3 numeric;
+  alter table customer_master add column custom_numeric_4 numeric;
+  alter table customer_master add column custom_numeric_5 numeric;
+  alter table customer_master add column custom_numeric_6 numeric;
+  alter table customer_master add column custom_numeric_7 numeric;
+  alter table customer_master add column custom_numeric_8 numeric;
+  alter table customer_master add column custom_numeric_9 numeric;
+  alter table customer_master add column custom_numeric_10 numeric;
+
+  alter table delivery_header add column custom_text_1 text;
+  alter table delivery_header add column custom_text_2 text;
+  alter table delivery_header add column custom_text_3 text;
+  alter table delivery_header add column custom_text_4 text;
+  alter table delivery_header add column custom_text_5 text;
+  alter table delivery_header add column custom_text_6 text;
+  alter table delivery_header add column custom_text_7 text;
+  alter table delivery_header add column custom_text_8 text;
+  alter table delivery_header add column custom_text_9 text;
+  alter table delivery_header add column custom_text_10 text;
+  alter table delivery_header add column custom_date_1 date;
+  alter table delivery_header add column custom_date_2 date;
+  alter table delivery_header add column custom_date_3 date;
+  alter table delivery_header add column custom_date_4 date;
+  alter table delivery_header add column custom_date_5 date;
+  alter table delivery_header add column custom_date_6 date;
+  alter table delivery_header add column custom_date_7 date;
+  alter table delivery_header add column custom_date_8 date;
+  alter table delivery_header add column custom_date_9 date;
+  alter table delivery_header add column custom_date_10 date;
+  alter table delivery_header add column custom_numeric_1 numeric;
+  alter table delivery_header add column custom_numeric_2 numeric;
+  alter table delivery_header add column custom_numeric_3 numeric;
+  alter table delivery_header add column custom_numeric_4 numeric;
+  alter table delivery_header add column custom_numeric_5 numeric;
+  alter table delivery_header add column custom_numeric_6 numeric;
+  alter table delivery_header add column custom_numeric_7 numeric;
+  alter table delivery_header add column custom_numeric_8 numeric;
+  alter table delivery_header add column custom_numeric_9 numeric;
+  alter table delivery_header add column custom_numeric_10 numeric;
+
+  alter table equip_master add column custom_text_1 text;
+  alter table equip_master add column custom_text_2 text;
+  alter table equip_master add column custom_text_3 text;
+  alter table equip_master add column custom_text_4 text;
+  alter table equip_master add column custom_text_5 text;
+  alter table equip_master add column custom_text_6 text;
+  alter table equip_master add column custom_text_7 text;
+  alter table equip_master add column custom_text_8 text;
+  alter table equip_master add column custom_text_9 text;
+  alter table equip_master add column custom_text_10 text;
+  alter table equip_master add column custom_date_1 date;
+  alter table equip_master add column custom_date_2 date;
+  alter table equip_master add column custom_date_3 date;
+  alter table equip_master add column custom_date_4 date;
+  alter table equip_master add column custom_date_5 date;
+  alter table equip_master add column custom_date_6 date;
+  alter table equip_master add column custom_date_7 date;
+  alter table equip_master add column custom_date_8 date;
+  alter table equip_master add column custom_date_9 date;
+  alter table equip_master add column custom_date_10 date;
+  alter table equip_master add column custom_numeric_1 numeric;
+  alter table equip_master add column custom_numeric_2 numeric;
+  alter table equip_master add column custom_numeric_3 numeric;
+  alter table equip_master add column custom_numeric_4 numeric;
+  alter table equip_master add column custom_numeric_5 numeric;
+  alter table equip_master add column custom_numeric_6 numeric;
+  alter table equip_master add column custom_numeric_7 numeric;
+  alter table equip_master add column custom_numeric_8 numeric;
+  alter table equip_master add column custom_numeric_9 numeric;
+  alter table equip_master add column custom_numeric_10 numeric;
+
+  alter table estimate_header add column custom_text_1 text;
+  alter table estimate_header add column custom_text_2 text;
+  alter table estimate_header add column custom_text_3 text;
+  alter table estimate_header add column custom_text_4 text;
+  alter table estimate_header add column custom_text_5 text;
+  alter table estimate_header add column custom_text_6 text;
+  alter table estimate_header add column custom_text_7 text;
+  alter table estimate_header add column custom_text_8 text;
+  alter table estimate_header add column custom_text_9 text;
+  alter table estimate_header add column custom_text_10 text;
+  alter table estimate_header add column custom_date_1 date;
+  alter table estimate_header add column custom_date_2 date;
+  alter table estimate_header add column custom_date_3 date;
+  alter table estimate_header add column custom_date_4 date;
+  alter table estimate_header add column custom_date_5 date;
+  alter table estimate_header add column custom_date_6 date;
+  alter table estimate_header add column custom_date_7 date;
+  alter table estimate_header add column custom_date_8 date;
+  alter table estimate_header add column custom_date_9 date;
+  alter table estimate_header add column custom_date_10 date;
+  alter table estimate_header add column custom_numeric_1 numeric;
+  alter table estimate_header add column custom_numeric_2 numeric;
+  alter table estimate_header add column custom_numeric_3 numeric;
+  alter table estimate_header add column custom_numeric_4 numeric;
+  alter table estimate_header add column custom_numeric_5 numeric;
+  alter table estimate_header add column custom_numeric_6 numeric;
+  alter table estimate_header add column custom_numeric_7 numeric;
+  alter table estimate_header add column custom_numeric_8 numeric;
+  alter table estimate_header add column custom_numeric_9 numeric;
+  alter table estimate_header add column custom_numeric_10 numeric;
+
+  alter table item_group_master add column custom_text_1 text;
+  alter table item_group_master add column custom_text_2 text;
+  alter table item_group_master add column custom_text_3 text;
+  alter table item_group_master add column custom_text_4 text;
+  alter table item_group_master add column custom_text_5 text;
+  alter table item_group_master add column custom_text_6 text;
+  alter table item_group_master add column custom_text_7 text;
+  alter table item_group_master add column custom_text_8 text;
+  alter table item_group_master add column custom_text_9 text;
+  alter table item_group_master add column custom_text_10 text;
+  alter table item_group_master add column custom_date_1 date;
+  alter table item_group_master add column custom_date_2 date;
+  alter table item_group_master add column custom_date_3 date;
+  alter table item_group_master add column custom_date_4 date;
+  alter table item_group_master add column custom_date_5 date;
+  alter table item_group_master add column custom_date_6 date;
+  alter table item_group_master add column custom_date_7 date;
+  alter table item_group_master add column custom_date_8 date;
+  alter table item_group_master add column custom_date_9 date;
+  alter table item_group_master add column custom_date_10 date;
+  alter table item_group_master add column custom_numeric_1 numeric;
+  alter table item_group_master add column custom_numeric_2 numeric;
+  alter table item_group_master add column custom_numeric_3 numeric;
+  alter table item_group_master add column custom_numeric_4 numeric;
+  alter table item_group_master add column custom_numeric_5 numeric;
+  alter table item_group_master add column custom_numeric_6 numeric;
+  alter table item_group_master add column custom_numeric_7 numeric;
+  alter table item_group_master add column custom_numeric_8 numeric;
+  alter table item_group_master add column custom_numeric_9 numeric;
+  alter table item_group_master add column custom_numeric_10 numeric;
+
+  alter table item_master add column custom_text_1 text;
+  alter table item_master add column custom_text_2 text;
+  alter table item_master add column custom_text_3 text;
+  alter table item_master add column custom_text_4 text;
+  alter table item_master add column custom_text_5 text;
+  alter table item_master add column custom_text_6 text;
+  alter table item_master add column custom_text_7 text;
+  alter table item_master add column custom_text_8 text;
+  alter table item_master add column custom_text_9 text;
+  alter table item_master add column custom_text_10 text;
+  alter table item_master add column custom_date_1 date;
+  alter table item_master add column custom_date_2 date;
+  alter table item_master add column custom_date_3 date;
+  alter table item_master add column custom_date_4 date;
+  alter table item_master add column custom_date_5 date;
+  alter table item_master add column custom_date_6 date;
+  alter table item_master add column custom_date_7 date;
+  alter table item_master add column custom_date_8 date;
+  alter table item_master add column custom_date_9 date;
+  alter table item_master add column custom_date_10 date;
+  alter table item_master add column custom_numeric_1 numeric;
+  alter table item_master add column custom_numeric_2 numeric;
+  alter table item_master add column custom_numeric_3 numeric;
+  alter table item_master add column custom_numeric_4 numeric;
+  alter table item_master add column custom_numeric_5 numeric;
+  alter table item_master add column custom_numeric_6 numeric;
+  alter table item_master add column custom_numeric_7 numeric;
+  alter table item_master add column custom_numeric_8 numeric;
+  alter table item_master add column custom_numeric_9 numeric;
+  alter table item_master add column custom_numeric_10 numeric;
+
+  alter table location_master add column custom_text_1 text;
+  alter table location_master add column custom_text_2 text;
+  alter table location_master add column custom_text_3 text;
+  alter table location_master add column custom_text_4 text;
+  alter table location_master add column custom_text_5 text;
+  alter table location_master add column custom_text_6 text;
+  alter table location_master add column custom_text_7 text;
+  alter table location_master add column custom_text_8 text;
+  alter table location_master add column custom_text_9 text;
+  alter table location_master add column custom_text_10 text;
+  alter table location_master add column custom_date_1 date;
+  alter table location_master add column custom_date_2 date;
+  alter table location_master add column custom_date_3 date;
+  alter table location_master add column custom_date_4 date;
+  alter table location_master add column custom_date_5 date;
+  alter table location_master add column custom_date_6 date;
+  alter table location_master add column custom_date_7 date;
+  alter table location_master add column custom_date_8 date;
+  alter table location_master add column custom_date_9 date;
+  alter table location_master add column custom_date_10 date;
+  alter table location_master add column custom_numeric_1 numeric;
+  alter table location_master add column custom_numeric_2 numeric;
+  alter table location_master add column custom_numeric_3 numeric;
+  alter table location_master add column custom_numeric_4 numeric;
+  alter table location_master add column custom_numeric_5 numeric;
+  alter table location_master add column custom_numeric_6 numeric;
+  alter table location_master add column custom_numeric_7 numeric;
+  alter table location_master add column custom_numeric_8 numeric;
+  alter table location_master add column custom_numeric_9 numeric;
+  alter table location_master add column custom_numeric_10 numeric;
+
+  alter table order_header add column custom_text_1 text;
+  alter table order_header add column custom_text_2 text;
+  alter table order_header add column custom_text_3 text;
+  alter table order_header add column custom_text_4 text;
+  alter table order_header add column custom_text_5 text;
+  alter table order_header add column custom_text_6 text;
+  alter table order_header add column custom_text_7 text;
+  alter table order_header add column custom_text_8 text;
+  alter table order_header add column custom_text_9 text;
+  alter table order_header add column custom_text_10 text;
+  alter table order_header add column custom_date_1 date;
+  alter table order_header add column custom_date_2 date;
+  alter table order_header add column custom_date_3 date;
+  alter table order_header add column custom_date_4 date;
+  alter table order_header add column custom_date_5 date;
+  alter table order_header add column custom_date_6 date;
+  alter table order_header add column custom_date_7 date;
+  alter table order_header add column custom_date_8 date;
+  alter table order_header add column custom_date_9 date;
+  alter table order_header add column custom_date_10 date;
+  alter table order_header add column custom_numeric_1 numeric;
+  alter table order_header add column custom_numeric_2 numeric;
+  alter table order_header add column custom_numeric_3 numeric;
+  alter table order_header add column custom_numeric_4 numeric;
+  alter table order_header add column custom_numeric_5 numeric;
+  alter table order_header add column custom_numeric_6 numeric;
+  alter table order_header add column custom_numeric_7 numeric;
+  alter table order_header add column custom_numeric_8 numeric;
+  alter table order_header add column custom_numeric_9 numeric;
+  alter table order_header add column custom_numeric_10 numeric;
+
+  alter table paying_in add column custom_text_1 text;
+  alter table paying_in add column custom_text_2 text;
+  alter table paying_in add column custom_text_3 text;
+  alter table paying_in add column custom_text_4 text;
+  alter table paying_in add column custom_text_5 text;
+  alter table paying_in add column custom_text_6 text;
+  alter table paying_in add column custom_text_7 text;
+  alter table paying_in add column custom_text_8 text;
+  alter table paying_in add column custom_text_9 text;
+  alter table paying_in add column custom_text_10 text;
+  alter table paying_in add column custom_date_1 date;
+  alter table paying_in add column custom_date_2 date;
+  alter table paying_in add column custom_date_3 date;
+  alter table paying_in add column custom_date_4 date;
+  alter table paying_in add column custom_date_5 date;
+  alter table paying_in add column custom_date_6 date;
+  alter table paying_in add column custom_date_7 date;
+  alter table paying_in add column custom_date_8 date;
+  alter table paying_in add column custom_date_9 date;
+  alter table paying_in add column custom_date_10 date;
+  alter table paying_in add column custom_numeric_1 numeric;
+  alter table paying_in add column custom_numeric_2 numeric;
+  alter table paying_in add column custom_numeric_3 numeric;
+  alter table paying_in add column custom_numeric_4 numeric;
+  alter table paying_in add column custom_numeric_5 numeric;
+  alter table paying_in add column custom_numeric_6 numeric;
+  alter table paying_in add column custom_numeric_7 numeric;
+  alter table paying_in add column custom_numeric_8 numeric;
+  alter table paying_in add column custom_numeric_9 numeric;
+  alter table paying_in add column custom_numeric_10 numeric;
+
+  alter table payment add column custom_text_1 text;
+  alter table payment add column custom_text_2 text;
+  alter table payment add column custom_text_3 text;
+  alter table payment add column custom_text_4 text;
+  alter table payment add column custom_text_5 text;
+  alter table payment add column custom_text_6 text;
+  alter table payment add column custom_text_7 text;
+  alter table payment add column custom_text_8 text;
+  alter table payment add column custom_text_9 text;
+  alter table payment add column custom_text_10 text;
+  alter table payment add column custom_date_1 date;
+  alter table payment add column custom_date_2 date;
+  alter table payment add column custom_date_3 date;
+  alter table payment add column custom_date_4 date;
+  alter table payment add column custom_date_5 date;
+  alter table payment add column custom_date_6 date;
+  alter table payment add column custom_date_7 date;
+  alter table payment add column custom_date_8 date;
+  alter table payment add column custom_date_9 date;
+  alter table payment add column custom_date_10 date;
+  alter table payment add column custom_numeric_1 numeric;
+  alter table payment add column custom_numeric_2 numeric;
+  alter table payment add column custom_numeric_3 numeric;
+  alter table payment add column custom_numeric_4 numeric;
+  alter table payment add column custom_numeric_5 numeric;
+  alter table payment add column custom_numeric_6 numeric;
+  alter table payment add column custom_numeric_7 numeric;
+  alter table payment add column custom_numeric_8 numeric;
+  alter table payment add column custom_numeric_9 numeric;
+  alter table payment add column custom_numeric_10 numeric;
+
+  alter table plan add column custom_text_1 text;
+  alter table plan add column custom_text_2 text;
+  alter table plan add column custom_text_3 text;
+  alter table plan add column custom_text_4 text;
+  alter table plan add column custom_text_5 text;
+  alter table plan add column custom_text_6 text;
+  alter table plan add column custom_text_7 text;
+  alter table plan add column custom_text_8 text;
+  alter table plan add column custom_text_9 text;
+  alter table plan add column custom_text_10 text;
+  alter table plan add column custom_date_1 date;
+  alter table plan add column custom_date_2 date;
+  alter table plan add column custom_date_3 date;
+  alter table plan add column custom_date_4 date;
+  alter table plan add column custom_date_5 date;
+  alter table plan add column custom_date_6 date;
+  alter table plan add column custom_date_7 date;
+  alter table plan add column custom_date_8 date;
+  alter table plan add column custom_date_9 date;
+  alter table plan add column custom_date_10 date;
+  alter table plan add column custom_numeric_1 numeric;
+  alter table plan add column custom_numeric_2 numeric;
+  alter table plan add column custom_numeric_3 numeric;
+  alter table plan add column custom_numeric_4 numeric;
+  alter table plan add column custom_numeric_5 numeric;
+  alter table plan add column custom_numeric_6 numeric;
+  alter table plan add column custom_numeric_7 numeric;
+  alter table plan add column custom_numeric_8 numeric;
+  alter table plan add column custom_numeric_9 numeric;
+  alter table plan add column custom_numeric_10 numeric;
+
+  alter table process_master add column custom_text_1 text;
+  alter table process_master add column custom_text_2 text;
+  alter table process_master add column custom_text_3 text;
+  alter table process_master add column custom_text_4 text;
+  alter table process_master add column custom_text_5 text;
+  alter table process_master add column custom_text_6 text;
+  alter table process_master add column custom_text_7 text;
+  alter table process_master add column custom_text_8 text;
+  alter table process_master add column custom_text_9 text;
+  alter table process_master add column custom_text_10 text;
+  alter table process_master add column custom_date_1 date;
+  alter table process_master add column custom_date_2 date;
+  alter table process_master add column custom_date_3 date;
+  alter table process_master add column custom_date_4 date;
+  alter table process_master add column custom_date_5 date;
+  alter table process_master add column custom_date_6 date;
+  alter table process_master add column custom_date_7 date;
+  alter table process_master add column custom_date_8 date;
+  alter table process_master add column custom_date_9 date;
+  alter table process_master add column custom_date_10 date;
+  alter table process_master add column custom_numeric_1 numeric;
+  alter table process_master add column custom_numeric_2 numeric;
+  alter table process_master add column custom_numeric_3 numeric;
+  alter table process_master add column custom_numeric_4 numeric;
+  alter table process_master add column custom_numeric_5 numeric;
+  alter table process_master add column custom_numeric_6 numeric;
+  alter table process_master add column custom_numeric_7 numeric;
+  alter table process_master add column custom_numeric_8 numeric;
+  alter table process_master add column custom_numeric_9 numeric;
+  alter table process_master add column custom_numeric_10 numeric;
+
+  alter table received_header add column custom_text_1 text;
+  alter table received_header add column custom_text_2 text;
+  alter table received_header add column custom_text_3 text;
+  alter table received_header add column custom_text_4 text;
+  alter table received_header add column custom_text_5 text;
+  alter table received_header add column custom_text_6 text;
+  alter table received_header add column custom_text_7 text;
+  alter table received_header add column custom_text_8 text;
+  alter table received_header add column custom_text_9 text;
+  alter table received_header add column custom_text_10 text;
+  alter table received_header add column custom_date_1 date;
+  alter table received_header add column custom_date_2 date;
+  alter table received_header add column custom_date_3 date;
+  alter table received_header add column custom_date_4 date;
+  alter table received_header add column custom_date_5 date;
+  alter table received_header add column custom_date_6 date;
+  alter table received_header add column custom_date_7 date;
+  alter table received_header add column custom_date_8 date;
+  alter table received_header add column custom_date_9 date;
+  alter table received_header add column custom_date_10 date;
+  alter table received_header add column custom_numeric_1 numeric;
+  alter table received_header add column custom_numeric_2 numeric;
+  alter table received_header add column custom_numeric_3 numeric;
+  alter table received_header add column custom_numeric_4 numeric;
+  alter table received_header add column custom_numeric_5 numeric;
+  alter table received_header add column custom_numeric_6 numeric;
+  alter table received_header add column custom_numeric_7 numeric;
+  alter table received_header add column custom_numeric_8 numeric;
+  alter table received_header add column custom_numeric_9 numeric;
+  alter table received_header add column custom_numeric_10 numeric;
+
+  alter table section_master add column custom_text_1 text;
+  alter table section_master add column custom_text_2 text;
+  alter table section_master add column custom_text_3 text;
+  alter table section_master add column custom_text_4 text;
+  alter table section_master add column custom_text_5 text;
+  alter table section_master add column custom_text_6 text;
+  alter table section_master add column custom_text_7 text;
+  alter table section_master add column custom_text_8 text;
+  alter table section_master add column custom_text_9 text;
+  alter table section_master add column custom_text_10 text;
+  alter table section_master add column custom_date_1 date;
+  alter table section_master add column custom_date_2 date;
+  alter table section_master add column custom_date_3 date;
+  alter table section_master add column custom_date_4 date;
+  alter table section_master add column custom_date_5 date;
+  alter table section_master add column custom_date_6 date;
+  alter table section_master add column custom_date_7 date;
+  alter table section_master add column custom_date_8 date;
+  alter table section_master add column custom_date_9 date;
+  alter table section_master add column custom_date_10 date;
+  alter table section_master add column custom_numeric_1 numeric;
+  alter table section_master add column custom_numeric_2 numeric;
+  alter table section_master add column custom_numeric_3 numeric;
+  alter table section_master add column custom_numeric_4 numeric;
+  alter table section_master add column custom_numeric_5 numeric;
+  alter table section_master add column custom_numeric_6 numeric;
+  alter table section_master add column custom_numeric_7 numeric;
+  alter table section_master add column custom_numeric_8 numeric;
+  alter table section_master add column custom_numeric_9 numeric;
+  alter table section_master add column custom_numeric_10 numeric;
+
+  alter table seiban_change add column custom_text_1 text;
+  alter table seiban_change add column custom_text_2 text;
+  alter table seiban_change add column custom_text_3 text;
+  alter table seiban_change add column custom_text_4 text;
+  alter table seiban_change add column custom_text_5 text;
+  alter table seiban_change add column custom_text_6 text;
+  alter table seiban_change add column custom_text_7 text;
+  alter table seiban_change add column custom_text_8 text;
+  alter table seiban_change add column custom_text_9 text;
+  alter table seiban_change add column custom_text_10 text;
+  alter table seiban_change add column custom_date_1 date;
+  alter table seiban_change add column custom_date_2 date;
+  alter table seiban_change add column custom_date_3 date;
+  alter table seiban_change add column custom_date_4 date;
+  alter table seiban_change add column custom_date_5 date;
+  alter table seiban_change add column custom_date_6 date;
+  alter table seiban_change add column custom_date_7 date;
+  alter table seiban_change add column custom_date_8 date;
+  alter table seiban_change add column custom_date_9 date;
+  alter table seiban_change add column custom_date_10 date;
+  alter table seiban_change add column custom_numeric_1 numeric;
+  alter table seiban_change add column custom_numeric_2 numeric;
+  alter table seiban_change add column custom_numeric_3 numeric;
+  alter table seiban_change add column custom_numeric_4 numeric;
+  alter table seiban_change add column custom_numeric_5 numeric;
+  alter table seiban_change add column custom_numeric_6 numeric;
+  alter table seiban_change add column custom_numeric_7 numeric;
+  alter table seiban_change add column custom_numeric_8 numeric;
+  alter table seiban_change add column custom_numeric_9 numeric;
+  alter table seiban_change add column custom_numeric_10 numeric;
+
+  alter table waster_master add column custom_text_1 text;
+  alter table waster_master add column custom_text_2 text;
+  alter table waster_master add column custom_text_3 text;
+  alter table waster_master add column custom_text_4 text;
+  alter table waster_master add column custom_text_5 text;
+  alter table waster_master add column custom_text_6 text;
+  alter table waster_master add column custom_text_7 text;
+  alter table waster_master add column custom_text_8 text;
+  alter table waster_master add column custom_text_9 text;
+  alter table waster_master add column custom_text_10 text;
+  alter table waster_master add column custom_date_1 date;
+  alter table waster_master add column custom_date_2 date;
+  alter table waster_master add column custom_date_3 date;
+  alter table waster_master add column custom_date_4 date;
+  alter table waster_master add column custom_date_5 date;
+  alter table waster_master add column custom_date_6 date;
+  alter table waster_master add column custom_date_7 date;
+  alter table waster_master add column custom_date_8 date;
+  alter table waster_master add column custom_date_9 date;
+  alter table waster_master add column custom_date_10 date;
+  alter table waster_master add column custom_numeric_1 numeric;
+  alter table waster_master add column custom_numeric_2 numeric;
+  alter table waster_master add column custom_numeric_3 numeric;
+  alter table waster_master add column custom_numeric_4 numeric;
+  alter table waster_master add column custom_numeric_5 numeric;
+  alter table waster_master add column custom_numeric_6 numeric;
+  alter table waster_master add column custom_numeric_7 numeric;
+  alter table waster_master add column custom_numeric_8 numeric;
+  alter table waster_master add column custom_numeric_9 numeric;
+  alter table waster_master add column custom_numeric_10 numeric;
+
+  alter table worker_master add column custom_text_1 text;
+  alter table worker_master add column custom_text_2 text;
+  alter table worker_master add column custom_text_3 text;
+  alter table worker_master add column custom_text_4 text;
+  alter table worker_master add column custom_text_5 text;
+  alter table worker_master add column custom_text_6 text;
+  alter table worker_master add column custom_text_7 text;
+  alter table worker_master add column custom_text_8 text;
+  alter table worker_master add column custom_text_9 text;
+  alter table worker_master add column custom_text_10 text;
+  alter table worker_master add column custom_date_1 date;
+  alter table worker_master add column custom_date_2 date;
+  alter table worker_master add column custom_date_3 date;
+  alter table worker_master add column custom_date_4 date;
+  alter table worker_master add column custom_date_5 date;
+  alter table worker_master add column custom_date_6 date;
+  alter table worker_master add column custom_date_7 date;
+  alter table worker_master add column custom_date_8 date;
+  alter table worker_master add column custom_date_9 date;
+  alter table worker_master add column custom_date_10 date;
+  alter table worker_master add column custom_numeric_1 numeric;
+  alter table worker_master add column custom_numeric_2 numeric;
+  alter table worker_master add column custom_numeric_3 numeric;
+  alter table worker_master add column custom_numeric_4 numeric;
+  alter table worker_master add column custom_numeric_5 numeric;
+  alter table worker_master add column custom_numeric_6 numeric;
+  alter table worker_master add column custom_numeric_7 numeric;
+  alter table worker_master add column custom_numeric_8 numeric;
+  alter table worker_master add column custom_numeric_9 numeric;
+  alter table worker_master add column custom_numeric_10 numeric;
+
+  alter table page_info add column last_show_time timestamp;
+
+  alter table company_master add column original_image_file_name text;
+  alter table item_master add column original_image_file_name text;
+
+  drop table if exists upload_file_info;
+  create table upload_file_info (
+    action_group text not null,
+    record_id int not null,
+    file_name text not null,
+    original_file_name text not null,
+    temp_upload_user_id int,
+
+    record_creator text,
+    record_create_date timestamp without time zone,
+    record_create_func text,
+    record_updater text,
+    record_update_date timestamp without time zone,
+    record_update_func text
+  );
+ 
+  alter table user_master add column image_file_name text;
+  alter table user_master add column original_image_file_name text;
+  alter table page_info add column saved_search_condition_info text;
+  alter table page_info add column subsum_criteria text;
+  alter table page_info add column subsum_criteria_datetype int;
+  alter table column_info add column column_filter text;
+
+# ----------------------------------------------------------------------
+
+# 今後 13iでスキーマ変更がある場合、同内容を15iのスキーマ変更として移植するほか、
+# Gen_Db::schemaAutoUpdate() および Gen_Db::_updateSchema() を変更する必要がある。
+
+# 13i rev.20140224（スキーマver 2014022401）分は 15i の 2014010127, 2014010129 として実装。
+
+# 13i rev.20131219
+2013121901: >
+  alter table bill_header add column detail_display int default 0;
+  
+# 13i rev.20130730
+2013073001: >
+  /* 読み込み前のDBのスキーマバージョンが高く、カラムが既存だった場合は、いったんカラムを削除 */
+  alter table item_master drop column if exists tax_rate;
+  alter table delivery_header drop column if exists receivable_report_timing;
+  alter table delivery_header drop column if exists customer_id;
+  alter table delivery_header drop column if exists delivery_customer_id;
+  alter table delivery_header drop column if exists bill_customer_id;
+  alter table delivery_header drop column if exists rounding;
+  alter table delivery_header drop column if exists precision;
+  alter table delivery_header drop column if exists tax_category;
+  alter table delivery_header drop column if exists bill_pattern;
+  alter table delivery_header drop column if exists delivery_note_amount;
+  alter table delivery_header drop column if exists delivery_note_tax;
+  alter table delivery_header drop column if exists foreign_currency_id;
+  alter table delivery_header drop column if exists foreign_currency_rate;
+  alter table delivery_header drop column if exists foreign_currency_delivery_note_amount;
+  alter table delivery_header drop column if exists foreign_currency_delivery_note_tax;
+  alter table delivery_header drop column if exists bill_header_id;
+  alter table delivery_detail drop column if exists tax_rate;
+  alter table delivery_detail drop column if exists foreign_currency_delivery_tax;
+  alter table bill_header drop column if exists rounding;
+  alter table bill_header drop column if exists precision;
+  alter table bill_header drop column if exists tax_category;
+  alter table bill_header drop column if exists foreign_currency_tax_amount;
+  alter table bill_detail drop column if exists tax_rate;
+  alter table bill_detail drop column if exists foreign_currency_tax;
+  
+  alter table item_master add column tax_rate numeric;
+  alter table delivery_header add column receivable_report_timing int;
+  alter table delivery_header add column customer_id int;
+  alter table delivery_header add column delivery_customer_id int;
+  alter table delivery_header add column bill_customer_id int;
+  alter table delivery_header add column rounding text;
+  alter table delivery_header add column precision int not null default 0;
+  alter table delivery_header add column tax_category int;
+  alter table delivery_header add column bill_pattern int;
+  alter table delivery_header add column delivery_note_amount numeric not null default 0;
+  alter table delivery_header add column delivery_note_tax numeric not null default 0;
+  alter table delivery_header add column foreign_currency_id int;
+  alter table delivery_header add column foreign_currency_rate numeric;
+  alter table delivery_header add column foreign_currency_delivery_note_amount numeric;
+  alter table delivery_header add column foreign_currency_delivery_note_tax numeric;
+  alter table delivery_header add column bill_header_id int;
+  alter table delivery_detail add column tax_rate numeric;
+  alter table delivery_detail add column foreign_currency_delivery_tax numeric;
+  alter table bill_header add column rounding text;
+  alter table bill_header add column precision int not null default 0;
+  alter table bill_header add column tax_category int;
+  alter table bill_header add column foreign_currency_tax_amount numeric;
+  alter table bill_detail add column tax_rate numeric;
+  alter table bill_detail add column foreign_currency_tax numeric;
+  
+  update item_master set tax_rate = 0 where coalesce(tax_class,0) = 1;
+  update
+      delivery_detail
+  set
+      tax_rate = (case when tax_class = 1 then 0 else t_tax_rate.tax_rate end)
+  from
+      (select
+          delivery_detail_id
+          ,max_apply_date
+          ,tax_rate
+      from
+          (select
+              delivery_detail_id
+              ,max(apply_date) as max_apply_date
+          from
+              delivery_detail
+              inner join delivery_header on delivery_detail.delivery_header_id = delivery_header.delivery_header_id
+              left join (select tax_rate, apply_date from tax_rate_master
+                  union select 5 as tax_rate, '1997-04-01' as apply_date from company_master
+                  ) as tax_rate_master on coalesce(delivery_header.inspection_date,delivery_header.delivery_date) >= tax_rate_master.apply_date
+          group by
+              delivery_detail_id
+          ) as t_tax_apply_date
+          left join (select tax_rate, apply_date from tax_rate_master
+              union select 5 as tax_rate, '1997-04-01' as apply_date from company_master
+              ) as t_tax_master on t_tax_apply_date.max_apply_date = t_tax_master.apply_date
+      ) as t_tax_rate
+  where
+      delivery_detail.delivery_detail_id = t_tax_rate.delivery_detail_id
+  ;
+  update
+      delivery_header
+  set
+      customer_id = t_detail.customer_id
+      ,delivery_customer_id = t_detail.delivery_customer_id
+      ,bill_customer_id = t_detail.bill_customer_id
+      ,rounding = t_detail.rounding
+      ,precision = t_detail.precision
+      ,tax_category = t_detail.tax_category
+      ,bill_pattern = t_detail.bill_pattern
+      ,foreign_currency_id = t_detail.foreign_currency_id
+      ,foreign_currency_rate = t_detail.foreign_currency_rate
+  from
+      (select
+          delivery_detail.delivery_header_id
+          ,max(received_header.customer_id) as customer_id
+          ,max(received_header.delivery_customer_id) as delivery_customer_id
+          ,max(coalesce(customer_master.bill_customer_id, customer_master.customer_id)) as bill_customer_id
+          ,max(t_bill_customer.rounding) as rounding
+          ,max(t_bill_customer.precision) as precision
+          ,max(t_bill_customer.tax_category) as tax_category
+          ,max(t_bill_customer.bill_pattern) as bill_pattern
+          ,max(delivery_detail.foreign_currency_id) as foreign_currency_id
+          ,max(delivery_detail.foreign_currency_rate) as foreign_currency_rate
+      from
+          delivery_detail
+          inner join received_detail on delivery_detail.received_detail_id = received_detail.received_detail_id
+          inner join received_header on received_detail.received_header_id = received_header.received_header_id
+          inner join customer_master on received_header.customer_id = customer_master.customer_id
+          inner join customer_master as t_bill_customer on coalesce(customer_master.bill_customer_id, customer_master.customer_id) = t_bill_customer.customer_id
+          left join company_master on 1=1
+      group by
+          delivery_detail.delivery_header_id) as t_detail
+  where
+      delivery_header.delivery_header_id = t_detail.delivery_header_id
+  ;
+  update
+      delivery_header
+  set
+      delivery_note_amount = t_delivery_note.delivery_note_amount
+      ,delivery_note_tax = t_delivery_note.delivery_note_tax
+      ,foreign_currency_delivery_note_amount = t_delivery_note.foreign_currency_delivery_note_amount
+      ,foreign_currency_delivery_note_tax = t_delivery_note.foreign_currency_delivery_note_tax
+  from
+      (select
+          delivery_header.delivery_header_id
+          ,sum(delivery_amount) as delivery_note_amount
+          ,gen_round_precision(
+              sum(
+                  case delivery_header.tax_category
+                      when 1 then     /* 1: 納品書単位 */
+                          delivery_detail.delivery_amount * coalesce(delivery_detail.tax_rate,0) / 100.00
+                      when 2 then     /* 2: 納品明細単位 */
+                          delivery_detail.delivery_tax
+                      else            /* 0: 請求書単位 */
+                          0
+                  end
+              ),
+              max(delivery_header.rounding), max(delivery_header.precision)) as delivery_note_tax
+          ,sum(delivery_detail.foreign_currency_delivery_amount) as foreign_currency_delivery_note_amount
+          ,gen_round_precision(
+              sum(
+                  case delivery_header.tax_category
+                      when 1 then     /* 1: 納品書単位 */
+                          delivery_detail.foreign_currency_delivery_amount * coalesce(delivery_detail.tax_rate,0) / 100.00
+                      when 2 then     /* 2: 納品明細単位 */
+                          delivery_detail.foreign_currency_delivery_tax
+                      else            /* 0: 請求書単位 */
+                          0
+                  end
+              ),
+              max(delivery_header.rounding), max(delivery_header.precision)) as foreign_currency_delivery_note_tax
+      from
+          delivery_detail
+          inner join delivery_header on delivery_detail.delivery_header_id = delivery_header.delivery_header_id
+          inner join received_detail on delivery_detail.received_detail_id = received_detail.received_detail_id
+          inner join received_header on received_header.received_header_id = received_detail.received_header_id
+          inner join customer_master on received_header.customer_id = customer_master.customer_id
+      group by
+          delivery_header.delivery_header_id
+      ) as t_delivery_note
+  where
+      delivery_header.delivery_header_id = t_delivery_note.delivery_header_id
+  ;
+  update
+      delivery_header
+  set
+      bill_header_id = bill_header.bill_header_id
+  from
+      bill_header
+  where
+      delivery_header.delivery_header_id = bill_header.delivery_header_id
+      and bill_header.delivery_header_id is not null
+  ;
+  update
+      bill_header
+  set
+      rounding = customer_master.rounding
+      ,precision = customer_master.precision
+      ,tax_category = customer_master.tax_category
+  from
+      customer_master
+  where
+      bill_header.customer_id = customer_master.customer_id
+  ;
+  update
+      delivery_header
+  set
+      bill_header_id =
+      coalesce((
+          select
+              bill_header.bill_header_id
+          from
+              bill_header
+          where
+              delivery_header.delivery_date between bill_header.begin_date and bill_header.close_date
+              and delivery_header.bill_customer_id = bill_header.customer_id
+              and coalesce(delivery_header.foreign_currency_id,-99999999) = coalesce(bill_header.foreign_currency_id,-99999999)
+              and bill_header.bill_pattern in (0,1)
+      ), bill_header_id)
+  ;
+  update
+      delivery_header
+  set
+      receivable_report_timing = t_timing.receivable_report_timing
+  from
+      (select
+          delivery_header_id
+          ,min(case when company_master.receivable_report_timing = 1 and inspection_date is null and coalesce(bill_header_id,-99999999) <> -99999999 then 0
+            else company_master.receivable_report_timing end) as receivable_report_timing
+      from
+          delivery_header
+          left join company_master on 1=1
+      group by
+          delivery_header_id) as t_timing
+  where
+      delivery_header.delivery_header_id = t_timing.delivery_header_id
+  ;
+  alter table bill_header drop column if exists delivery_header_id;
+  alter table delivery_detail drop column if exists foreign_currency_id;
+  alter table delivery_detail drop column if exists foreign_currency_rate;
+
+# 13i rev.20130527
+2013052701: >
+  drop table if exists customer_group_master;
+  create table customer_group_master
+  (
+      customer_group_id serial primary key,
+      customer_group_code text not null,
+      customer_group_name text not null,
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+  alter table customer_master add column customer_group_id_1 integer;
+  alter table customer_master add column customer_group_id_2 integer;
+  alter table customer_master add column customer_group_id_3 integer;
+  
+# 13i rev.20130423
+2013042301: >
+  drop function gen_round_precision(numeric, text, integer);
+  CREATE OR REPLACE FUNCTION gen_round_precision(numeric, text, int)
+    RETURNS numeric AS
+  $BODY$
+      select
+          case $2
+              when 'floor'    then trunc(trunc($1 * cast(pow(10, $3) as numeric)) / cast(pow(10, $3) as numeric), $3)
+              when 'ceil'     then trunc(trunc($1 * cast(pow(10, $3) as numeric) + case when $1 >=0 then 1 else -1 end * 0.9) / cast(pow(10, $3) as numeric), $3)
+              else round($1, $3)
+          end
+  $BODY$
+    LANGUAGE 'sql' VOLATILE;
+  ALTER FUNCTION gen_round_precision(numeric, text, int) OWNER TO postgres;
+
+# 13i rev.20130312
+2013031201: >
+  alter table company_master add column unlock_object_1 integer default 0;
+  alter table company_master add column unlock_object_2 integer default 0;
+  alter table company_master add column unlock_object_3 integer default 0;
+  alter table company_master add column unlock_object_4 integer default 0;
+
+# 13i rev.20130307
+2013030701: >
+  alter table bill_detail add column lot_no text;
+
+# 13i rev.20130226
+2013022601: >
+  alter table bill_header add column bill_printed_flag boolean;
+  update bill_header set bill_printed_flag = true;
+  update customer_master set bill_customer_id = null where bill_customer_id = customer_id;
+
+# 13i rev.20130219
+2013021901: >
+  alter table accepted add column foreign_currency_rate numeric;
+
+# 13i rev.20130125
+2013012501: >
+  drop table if exists error_log;
+  create table error_log (
+      error_id serial primary key,
+      error_time timestamp not null,
+      user_name text,
+      ip text,
+      function_name text,
+      error_no text,
+      error_comment text,
+      error_query text,
+      remarks text
+  );
+
+# 13i rev.20121207
+2012120701: >
+  alter table item_master drop constraint if exists item_master_item_group_id_fkey;
+  alter table achievement drop constraint if exists achievement_item_id_fkey;
+
+# 13i rev.20121113
+2012111301: >
+ drop index bill_header_index1;
+ alter table bill_header add column delivery_header_id int default 0;
+ alter table user_master add column customer_id int;
+ alter table received_detail add column customer_received_printed_flag bool;
+ alter table order_header add column partner_order_printed_flag bool;
+ alter table location_move add column order_detail_id int;
+ alter table location_move add column move_printed_flag bool;
+
+# 12i rev.20120918
+2012091801: >
+ alter table estimate_header add column estimate_rank int default 0;
+
+# 12i rev.20120814
+2012081401: >
+ update paying_in set way_of_payment = way_of_payment + 1 where way_of_payment >= 3;
+ update payment set way_of_payment = way_of_payment + 1 where way_of_payment >= 3;
+ update process_master set process_name = '(標準工程/default)' where process_id = 0;
+
+# 12i rev.20120807
+2012080701: >
+ alter table item_process_master rename process_remarks to process_remarks_1;
+ alter table item_process_master add column process_remarks_2 text;
+ alter table item_process_master add column process_remarks_3 text;
+ alter table order_detail rename subcontract_process_remarks to subcontract_process_remarks_1;
+ alter table order_detail add column subcontract_process_remarks_2 text;
+ alter table order_detail add column subcontract_process_remarks_3 text;
+ alter table order_process rename process_remarks to process_remarks_1;
+ alter table order_process add column process_remarks_2 text;
+ alter table order_process add column process_remarks_3 text;
+ alter table estimate_header add column section_id int;
+
+# 12i rev.20120723
+2012072301: >
+ alter table company_master add column excel_date_type int not null default 1;
+
+# 12i rev.20120710
+2012071001: >
+  alter table delivery_header add column remarks_header_2 text;
+  alter table delivery_header add column remarks_header_3 text;
+
+# 12i rev.20120625
+2012062501: >
+  alter table item_master add column quantity_per_carton numeric default 1;
+
+# 12i rev.20120619
+2012061901: >
+  alter table received_header add column remarks_header_2 text;
+  alter table received_header add column remarks_header_3 text;
+
+# 12i rev.20120403
+2012040301: >
+  alter table company_master add column assessment_rounding text default 'round';
+  alter table company_master add column assessment_precision int not null default 2;
+
+# 12i rev.20120207
+2012020701: >
+  drop table if exists dropdown_info;
+  create table dropdown_info (
+    user_id integer not null,
+    category text not null,
+    orderby_field text not null,
+    orderby_desc integer default 0,
+
+    record_creator text,
+    record_create_date timestamp without time zone,
+    record_create_func text,
+    record_updater text,
+    record_update_date timestamp without time zone,
+    record_update_func text
+  );
+  CREATE UNIQUE INDEX dropdown_info_index1 ON dropdown_info (user_id, category);
+  alter table received_detail add column received_printed_flag boolean;
+
+2011112501: >
+  alter table item_master add column default_selling_price_2 numeric;
+  alter table item_master add column default_selling_price_3 numeric;
+  alter table item_master add column selling_price_limit_qty_1 numeric;
+  alter table item_master add column selling_price_limit_qty_2 numeric;
+
+# 不具合による影響を修正
+2011110104: >
+  update order_detail set subcontract_order_process_no = null where subcontract_order_process_no = '';
+
+# 12i rev.20111101
+2011110103: >
+  CREATE OR REPLACE FUNCTION gen_round_precision(numeric, text, int)
+    RETURNS numeric AS
+  $BODY$
+    select
+        case $2
+            when 'floor'    then trunc($1 * cast(pow(10, $3) as numeric)) / cast(pow(10, $3) as numeric)
+            when 'ceil'     then trunc($1 * cast(pow(10, $3) as numeric) + case when $1 >=0 then 1 else -1 end * 0.9) / cast(pow(10, $3) as numeric)
+            else round($1, $3)
+        end
+  $BODY$
+    LANGUAGE 'sql' VOLATILE;
+
+  ALTER FUNCTION gen_round_precision(numeric, text, int) OWNER TO postgres;
+
+# 不具合による影響を修正
+2011110101: >
+  update delivery_detail set sales_base_cost_total = sales_base_cost * delivery_quantity where foreign_currency_rate is not null;
+
+# 12i rev.20111025
+2011102404: >
+  alter table received_header add column estimate_header_id int;
+
+2011102402: >
+  alter table bill_detail add column measure text;
+  alter table bill_detail add column delivery_customer_id int;
+
+# 12i rev.20111021
+2011102101: >
+  alter table estimate_header add column customer_id int;
+
+# 12i rev.20111014
+2011101401: >
+  alter table item_master add column comment_4 text;
+  alter table item_master add column comment_5 text;
+  alter table customer_master add column remarks_2 text;
+  alter table customer_master add column remarks_3 text;
+  alter table customer_master add column remarks_4 text;
+  alter table customer_master add column remarks_5 text;
+  delete from control_info where action='Master_Item_Edit';
+
+# 12i rev.20111014
+2011101400: >
+  drop table if exists user_template_info;
+  create table user_template_info (
+      user_id int not null,
+      category text not null,
+      template_name text not null,
+
+      record_creator text,
+      record_create_date timestamp,
+      record_create_func text,
+      record_updater text,
+      record_update_date timestamp,
+      record_update_func text
+  );
+  CREATE UNIQUE INDEX user_template_info_index1 ON user_template_info (user_id, category);
+
+# 12i rev.20110927
+2011092700:
+ - alter table bill_detail add column received_customer_id int;
+
+# 2010i -> 12i
+2011081200: >
+    delete from column_info;
+    delete from control_info;
+
+    alter table bill_detail add column customer_received_number text;
+
+    alter table company_master add column sales_lock_date date;
+    alter table company_master add column buy_lock_date date;
+    alter table company_master drop column tax_rate;
+    alter table company_master add column key_currency text default '￥';
+    alter table company_master add column account_lockout_threshold int default 10;
+    alter table company_master add column account_lockout_reset_minute int default 120;
+
+    alter table control_info add column control_hide bool;
+
+    alter table customer_master add column inspection_lead_time int;
+    alter table customer_master add column price_percent_group_id int;
+    alter table customer_master add column credit_line numeric;
+    alter table customer_master alter column opening_balance type numeric;
+    alter table customer_master alter column payment_opening_balance type numeric;
+    alter table customer_master add column precision int not null default 0;
+
+    alter table delivery_detail add column sales_base_cost numeric;
+    alter table delivery_detail add column foreign_currency_sales_base_cost numeric;
+    alter table delivery_detail add column sales_base_cost_total numeric;
+    alter table delivery_detail add column foreign_currency_sales_base_cost_total numeric;
+    update delivery_detail set delivery_amount = delivery_quantity * delivery_price where delivery_amount is null;
+
+    alter table item_master add column dummy_item bool;
+
+    alter table order_detail add column order_amount numeric;
+    alter table order_detail add column foreign_currency_order_amount numeric;
+    alter table order_detail add column order_tax numeric;
+
+    alter table received_header add column customer_received_number text;
+
+    alter table received_detail add column sales_base_cost numeric;
+    alter table received_detail add column foreign_currency_sales_base_cost numeric;
+
+    alter table session_table add column excel_flag bool not null default false;
+
+    alter table user_master add column account_lockout bool;
+    alter table user_master add column password_miss_count int;
+    alter table user_master add column password_miss_time timestamp;
+
+    drop table if exists alert_mail_master;
+    CREATE TABLE alert_mail_master
+    (
+        alert_mail_id serial primary key,
+        mail_address_id int not null,
+        alert_id text not null,
+
+        record_creator text,
+        record_create_date timestamp,
+        record_create_func text,
+        record_updater text,
+        record_update_date timestamp,
+        record_update_func text
+    );
+
+    drop table if exists mail_address_master;
+    CREATE TABLE mail_address_master
+    (
+        mail_address_id serial primary key,
+        mail_address text not null,
+        regist_flag bool not null,
+        regist_password text,
+        regist_limit timestamp,
+
+        record_creator text,
+        record_create_date timestamp,
+        record_create_func text,
+        record_updater text,
+        record_update_date timestamp,
+        record_update_func text
+    );
+
+    drop table if exists price_percent_group_master;
+    CREATE TABLE price_percent_group_master
+    (
+        price_percent_group_id serial primary key,
+        price_percent_group_code text unique not null,
+        price_percent_group_name text not null,
+        price_percent numeric not null,
+        remarks text,
+
+        record_creator text,
+        record_create_date timestamp,
+        record_create_func text,
+        record_updater text,
+        record_update_date timestamp,
+        record_update_func text
+    );
+
+    drop table if exists search_column_info;
+    CREATE TABLE search_column_info
+    (
+        user_id int not null,
+        action text not null,
+        column_key text,
+
+        column_number int,
+        column_hide bool,
+
+        record_creator text,
+        record_create_date timestamp,
+        record_create_func text,
+        record_updater text,
+        record_update_date timestamp,
+        record_update_func text
+    );
+    CREATE UNIQUE INDEX search_column_info_index1 ON search_column_info (user_id, action, column_key);
+    CREATE INDEX search_column_info_index2 ON search_column_info (column_number);
+
+    drop table if exists stickynote_info;
+    CREATE TABLE stickynote_info
+    (
+        stickynote_id serial primary key,
+
+        user_id int not null,
+        show_all_user bool not null,
+        allow_edit_all_user bool not null,
+        show_all_action bool not null,
+        action text,
+        x_pos int not null,
+        y_pos int not null,
+        width int not null,
+        height int not null,
+        content text not null,
+        color text not null,
+        system_note_no int,
+
+        record_creator text,
+        record_create_date timestamp,
+        record_create_func text,
+        record_updater text,
+        record_update_date timestamp,
+        record_update_func text
+    );
+
+    drop table if exists tax_rate_master;
+    CREATE TABLE tax_rate_master
+    (
+        tax_rate_id serial primary key,
+
+        tax_rate numeric not null,
+        apply_date date unique,
+
+        record_creator text,
+        record_create_date timestamp,
+        record_create_func text,
+        record_updater text,
+        record_update_date timestamp,
+        record_update_func text
+    );
+    create unique index tax_rate_master_index1 on tax_rate_master (apply_date);
+
+    CREATE OR REPLACE FUNCTION gen_round_precision(numeric, text, int)
+      RETURNS numeric AS
+    $BODY$
+        select
+            case $2
+                when 'floor'    then trunc($1 * cast(pow(10, $3) as numeric)) / cast(pow(10, $3) as numeric)
+                when 'ceil'     then trunc($1 * cast(pow(10, $3) as numeric) + 0.9) / cast(pow(10, $3) as numeric)
+                else round($1, $3)
+            end
+    $BODY$
+      LANGUAGE 'sql' VOLATILE;
+    ALTER FUNCTION gen_round_precision(numeric, text, int) OWNER TO postgres;
+
+
+
+# 2010i
+2011020100:
+ - alter table item_process_master add column subcontract_partner_id int;
+ - alter table item_process_master add column subcontract_unit_price numeric;
+ - alter table item_process_master add column process_remarks text;
+ - alter table order_process add column subcontract_partner_id int;
+ - alter table order_process add column subcontract_unit_price numeric;
+ - alter table order_process add column process_remarks text;
+ - alter table order_detail add column subcontract_order_process_no text;
+ - alter table order_detail add column subcontract_parent_order_no text;
+ - alter table order_detail add column subcontract_process_name text;
+ - alter table order_detail add column subcontract_process_remarks text;
+ - alter table order_detail add column subcontract_ship_to text;
+ - alter table accepted add column subcontract_inout_achievement_id int;

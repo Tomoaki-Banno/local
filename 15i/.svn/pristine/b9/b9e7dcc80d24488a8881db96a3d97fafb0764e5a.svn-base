@@ -1,0 +1,63 @@
+/*------- For List --------*/
+
+/* Listヘッダ */
+.gen_list_header {
+    background: #475966;
+    color: #fff; 
+    font-size:13px;
+    text-decoration:none;
+}
+.gen_list_header_sortmark {
+    color: #fff; 
+    font-size:13px;
+    text-decoration:none;
+}
+.gen_list_header_sortmark_selected {
+    color: #FA6565; 
+    font-size:13px;
+    text-decoration:none;
+}
+.gen_list_header_old {
+    background:linear-gradient(#f4f4f4, #d9d9d9);
+    /* webkit用 */
+    background:-webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#d9d9d9));
+    /* mozilla用 */
+    background:-moz-linear-gradient(top, #f4f4f4, #d9d9d9);
+    /* IE6 IE7 */
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startcolorstr=#f4f4f4, endcolorstr=#d9d9d9);
+    /* IE8 */
+    -ms-filter:"progid:DXImageTransform.Microsoft.gradient(GradientType=0,startcolorstr=#f4f4f4, endcolorstr=#d9d9d9))";
+    zoom: 1;
+}
+
+/* List集計行 */
+.gen_list_agg {
+    background:#d5ebff;
+}
+
+/* Listセル */
+td.gen_cell {
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    vertical-align:middle;
+    text-align:center;      /* td内のdivをセンタリングする処理。本来、divにtext-alignは効かないはずだがIE6ではこうする必要がある */
+    /*    white-space:nowrap;*/ /* 有効にするとIE6,chromeで不具合 */
+}
+
+/* 「削除」などのミニボタン */
+input.gen_list_mini_button { 
+    width: 36px;
+    height: 20px;
+    padding: 0px;
+    font-size:11px;
+    text-align: center;
+}
+
+/* Listセル内画像 */
+img.gen_cell_img {
+    height: 15px;   /* これ以上だとIE/FFで行の高さに影響する */
+    border: 0;
+    margin-top: 1px; /* 垂直中央 */
+}

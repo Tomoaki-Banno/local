@@ -1,0 +1,39 @@
+/*------- For Edit --------*/
+
+/* Edit画面タイトル */
+.editTitle td {
+    background:linear-gradient(#f4f4f4, #d9d9d9);
+    /* webkit用 */
+    background:-webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#d9d9d9));
+    /* mozilla用 */
+    background:-moz-linear-gradient(top, #f4f4f4, #d9d9d9);
+    /* IE6 IE7 */
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#f4f4f4', endColorstr='#d9d9d9');
+    /* IE8 */
+    -ms-filter:"progid:DXImageTransform.Microsoft.gradient(GradientType=0,startcolorstr=#f4f4f4, endcolorstr=#d9d9d9)";
+    text-align:center;
+}
+
+/* EditListヘッダ */
+.editListTitle td {
+    background-color:#90b0c9;
+}
+/* 同13i（オレンジグラデーション）*/
+.editListTitle_13i td {
+    background:linear-gradient(#f4f4f4, #ffdead);
+    /* webkit用 */
+    background:-webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#ffdead));
+    /* mozilla用 */
+    background:-moz-linear-gradient(top, #f4f4f4, #ffdead);
+    /* IE6 IE7 */
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startcolorstr=#f4f4f4, endcolorstr=#ffdead);
+    /* IE8 */
+    -ms-filter:"progid:DXImageTransform.Microsoft.gradient(GradientType=0,startcolorstr=#f4f4f4, endcolorstr=#ffdead)";
+}
+
+/* Edit画面のテキストボックス */
+.editTextbox {
+    height: 17px;
+    border:0px;
+    padding:0px;
+}

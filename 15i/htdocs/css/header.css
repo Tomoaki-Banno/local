@@ -1,0 +1,143 @@
+/*------- header bar --------*/
+
+.gen_header {
+    background:#fff;
+}
+
+/*------- menu bar --------*/
+
+#gen_menubar {
+    overflow: hidden;
+}
+
+#gen_menubar ul {
+    margin:0;
+    padding:0;
+    list-style:none;
+    height: 24px;
+    border-top: 1px solid #c7c7c7;
+    border-bottom: 1px solid #c7c7c7;
+}
+
+#gen_menubar ul li {
+    float:left;
+}
+
+#gen_menubar ul li a {
+    float: left;
+    color: #646464;
+    background: #F7F7F7;
+    padding: 5px 15px;  /* ウィンドウサイズが狭い時はこの値が上書きされる */
+    text-decoration: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(0,0,0,0.2);
+    /*
+    background: linear-gradient(#f4f4f4, #cfcfcf);
+    background: -webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#cfcfcf));
+    background: -moz-linear-gradient(top, #f4f4f4, #cfcfcf);
+    */
+}
+
+#gen_menubar ul li .gen_menu_disable {
+    background: #f4f4f4;
+    color: #cccccc;
+    cursor: default;
+}
+
+#gen_menubar ul li .gen_menu_current {
+    color: #0094ff;
+    font-weight: bold;
+    /*
+    border-bottom: 2px solid orange;
+    */
+}
+
+/* ウィンドウ幅が1024px以下のとき（iPadなど）はタブ幅を狭く */
+@media only screen and (max-width: 1025px) {
+   #gen_menubar ul li a {
+        padding: 5px 5px;
+    } 
+}
+
+/* submenu */
+
+#gen_menubar li ul {
+    left: -999em;   /* 非表示にする */
+    top: 0px;      /* メニューからサブメニューにマウスカーソルを移動した時にonmouseoutにならないよう、メニューバーとわずかに重ねておく */
+    background: #F3F3F3;
+    height: auto;
+    margin: 25px 0 0;
+    position: absolute;
+    width: 160px;
+    z-index: 9999;
+    /*
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) inset; 
+    -moz-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) inset; 
+    -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) inset; 
+    */
+    border-top: 0px;
+    border-bottom: 0px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+#gen_menubar li ul li {
+    border-top: 0px;
+    border-bottom: 0px;
+}
+
+#gen_menubar li ul a {
+    background: none;
+    border: 0 none;
+    margin-right: 0;
+    width: 130px;
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+}
+
+/* ウィンドウ幅が1024px以下のとき（iPadなど）はタブ幅を狭く */
+@media only screen and (max-width: 1025px) {
+   #gen_menubar li ul a {
+        width: 150px;
+    } 
+}
+
+#gen_menubar li ul a:hover {
+    color: #ffffff;
+    background: #0094ff;
+}
+
+/* iPadではサブメニューの行高を広くする */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+    #gen_menubar li ul a {
+        height: 22px;
+    }
+}
+
+/*------- my menu --------*/
+
+span.my_menu {
+    font-size: 13px;
+    background: #475966;
+    color: #fff;
+    text-decoration: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+a.my_menu_link {
+    font-size: 12px;
+    color: #fff;
+    text-decoration:none;
+}
+a.my_menu_link_selected {
+    font-size: 12px;
+    color: #fff;
+    text-decoration:none;
+}
+a.function_link {
+    font-size: 12px;
+    font-weight: bold;
+    color: #63727D;
+    text-decoration:none;
+}
